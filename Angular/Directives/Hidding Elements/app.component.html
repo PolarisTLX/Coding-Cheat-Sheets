@@ -1,0 +1,42 @@
+<!-- SHOW / HIDE div based on criteria with
+ *ngIf and ng-template   OR   [hidden] -->
+
+<!-- only one of these divs will be created to teh DOM-->
+<!-- <div *ngIf="courses.length > 0">
+  List of courses
+</div>
+<div *ngIf="courses.length == 0">
+  No courses yet
+</div> -->
+
+<!-- Angular 4 version of above: -->
+<div *ngIf="courses.length > 0; then coursesList else noCourses"></div>
+<ng-template #coursesList>
+  List of courses
+</ng-template>
+<ng-template #noCourses>
+  No courses yet
+</ng-template>
+
+
+<!-- Best to use *ngIf when there are a lot of elements and children elements,
+to reduce the number that are created and observed
+(easier to read when inspected, less resources, faster) -->
+
+<!-- [hidden] best for small/simple element trees -->
+<!-- *ngIf for larger/more complex element trees
+UNLESS BUILDING LARGE TREE WHILE USER IS INTERACTING IS RESOURCE COSTLY, THEN STILL USE [hidden]-->
+
+<!-- SHOW / HIDE div based on criteria with "hidden" attribute -->
+<!-- NOTE in this method, BOTH divs will be present in the dom when inspected
+    one will simply have the hidden attribute and not show in the browser -->
+
+<div hidden>
+  List of courses
+</div>
+<div [hidden]="courses.length == 0">
+  List of courses
+</div>
+<div [hidden]="courses.length > 0">
+  No courses yet
+</div>

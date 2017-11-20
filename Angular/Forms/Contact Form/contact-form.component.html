@@ -1,0 +1,79 @@
+<form #f="ngForm" (ngSubmit)="submit(f)">
+  <!-- next 2 lines, with ngModelGroup and div below it not always necessary -->
+  <div ngModelGroup="contactInfo" #contact="ngModelGroup">
+    <div *ngIf="!contact.valid">...all validation errors implemented like below</div>
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input
+          required minlength="5"
+          maxlength="30"
+          pattern="regexp pattern here"
+          ngModel
+          name="firstName"
+          #firstName="ngModel"
+          (change)="log(firstName)"
+          id="firstName"
+          type="text"
+          class="form-control"
+        >
+        <!-- for validation to check things are input properly, add boostrap "alert"
+             only when ngModel object is valid (see browser console)
+             firstName.touched  makes warning not appear right away on page load, only when user touches it and then moves away -->
+        <div
+          class="alert alert-danger"
+          *ngIf="firstName.touched && !firstName.valid">
+          <div *ngIf="firstName.errors.required">First name is required.</div>
+          <!-- <div *ngIf="firstName.errors.minlength">First name must be min 3 chars, max 30 char</div> -->
+          <div *ngIf="firstName.errors.minlength">First name must be min {{ firstName.errors.minlength.requiredLength }} chars, max 30 char</div>
+          <div *ngIf="firstName.errors.pattern">First name does not match required pattern</div>
+        </div>
+      </div>
+  </div>
+  <div class="form-group">
+    <label for="comment">Comment</label>
+    <textarea ngModel name="comment" id="comment" cols="30" rows="10" class="form-control"></textarea>
+  </div>
+
+  <!-- boottrap checkboxes -->
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ngModel name="wantsSubscribtion"> Subscribe to mailing list
+    </label>
+  </div>
+
+  <!-- boottrap radio buttons -->
+  <div *ngFor="let method of contactMethods" class="radio">
+    <label>
+      <!-- hard coded way:
+      <input type="radio" ngModel name="radio" value="1">Email <br/>
+      <input type="radio" ngModel name="radio" value="2">Phone <br/>
+      <input type="radio" ngModel name="radio" value="3">LinkedIn
+      -->
+      <input required ngModel type="radio" name="radio" [value]="method.id">{{ method.name }}
+      <!-- NOTE You can place the required on any part to control the submit button at the end-->
+    </label>
+  </div>
+
+  <!-- drop-down list -->
+  <div class="form-group">
+    <label for="contactMethod">Contact Method</label>
+    <!-- <select ngModel name="contactMethod" id="contactMethod" class="form-control"> -->
+    <!-- to allow user to select multiple options: (note it is no longer a drop-down list) -->
+    <select multiple ngModel name="contactMethod" id="contactMethod" class="form-control">
+      <!-- hard coded way:
+        <option value="">Email</option>
+        <option value="">Phone</option>
+        <option value="">LinkedIn</option>
+      -->
+      <!-- way that is populated by an external object, in this case from contact-form.component.ts contactMethods = [...] -->
+      <option *ngFor="let method of contactMethods" [ngValue]="method">{{ method.name }}</option>
+    </select>
+  </div>
+
+
+  <!-- <p> value below will help debug as it shows you the live values of the parts of the form above -->
+  <p>{{ f. value | json }}</p>
+
+  <button class="btn btn-primary" [disabled]="!f.valid">Submit</button>
+  <!-- can disable the button if the entire form (called "f" at the top:  ""<form #f=...") -->
+</form>

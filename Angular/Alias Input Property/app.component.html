@@ -1,1 +1,22 @@
 <favorite [isFavorite]="post.isFavorite"></favorite>
+<!-- the word "post..." above is and object from app.component.ts -->
+
+<!-- This below is from ngContent/ngContainer exercise with this file, app.component.html,  interacting with panel.component.html -->
+
+<!-- <favorite [isFavorite]="post.isFavorite" (change)="onFavoriteChanged($event)"></favorite> -->
+<!-- <h4>Trying to add Panel</h4> -->
+<bootstrap-panel>
+  <!--
+    <div class="heading">Heading</div>
+    replaced with: -->
+  <ng-container class="heading">Heading</ng-container>
+  <!--
+  when you "inspect" this in the browser, it will now only say "Heading"
+  instead of  the whole
+  "<div _ngcontent-c0 class="heading">Heading</div>"   that would see in the browser inspect otherwise
+  -->
+  <div class="body">
+    <h2>Body</h2>
+    <p>Some content here...</p>
+  </div>
+</bootstrap-panel>

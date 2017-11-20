@@ -1,0 +1,18 @@
+<form>
+  <input
+    type="text" class="form-control"
+    (keyup.enter)="addTopic(topic)" #topic
+  >
+  <!--   (keyup.enter) = keyup event only occurs when user presses enter -->
+  <ul class="list-group">
+    <li
+      *ngFor="let topic of topics.controls"
+      (click)="removeTopic(topic)"
+      class="list-group-item">
+      {{ topic.value }}
+    </li>
+    <!-- this line:
+     *ngFor="let topic of form.get('topics').controls"
+     was simplified/shortened above by using function "get topics()" in .ts file-->
+  </ul>
+</form>

@@ -1,0 +1,9 @@
+<!-- useful to avoid errors when dealing with complex objects -->
+
+<!-- <span>{{ task.assignee.name }}</span> -->
+<!-- in a scerver scenario, data in objects might be null at times, which will break the program
+    to solve this, only display this element if the item in the object is NOT null with *ngIf: -->
+<!-- <span *ngIf="task.assignee">{{ task.assignee.name }}</span> -->
+
+<!-- can also be accomplished with "safe-traversal-operator"  a  " ? " : -->
+<span>{{ task.assignee?.name }}</span>

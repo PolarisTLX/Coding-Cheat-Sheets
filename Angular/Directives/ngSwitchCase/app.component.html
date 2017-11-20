@@ -1,0 +1,12 @@
+<ul class="nav nav-pills">
+  <li [class.active]="viewMode == 'map'"><a (click)="viewMode = 'map'">Map View</a></li>
+  <li [class.active]="viewMode == 'list'"><a (click)="viewMode = 'list'">List View</a></li>
+  <!-- on click, it changes teh value that is stored in viewMode in file app.components.ts  -->
+</ul>
+<div [ngSwitch]="viewMode">
+<!-- viewMode is an object in app.component.ts export -->
+  <div *ngSwitchCase="'map'">Map View Content</div>
+  <!-- NOTE * and double "''" -->
+  <div *ngSwitchCase="'list'">List View Content</div>
+  <div *ngSwitchDefault>Default Content</div>
+</div>

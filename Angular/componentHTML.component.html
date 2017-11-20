@@ -1,0 +1,24 @@
+<!-- this is part of panel.component.html -->
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <ng-content select=".heading"></ng-content>
+  </div>
+  <div class="panel-body">
+    <ng-content select=".body"></ng-content>
+  </div>
+</div>
+
+<!--
+Previously this was:
+
+<div class="panel panel-default">
+  <div class="panel-heading">Heading</div>
+  <div class="panel-body">Body</div>
+</div>
+
+the <ng-content select=".body"></ng-content>
+allows you to build this stuff right in the file app.component.html
+
+You don't need "selector" if there is only 1 ng-content element, but example above has 2"
+-->

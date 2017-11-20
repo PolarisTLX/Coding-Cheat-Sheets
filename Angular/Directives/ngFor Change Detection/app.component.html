@@ -1,0 +1,35 @@
+<ul>
+  <!-- <li *ngFor="let course of courses">
+    {{ course.name }} -->
+  <li *ngFor="let course of courses; index as i">
+    {{ i }} - {{ course.name }}
+  <li *ngFor="let course of courses; even as isEven">
+    {{ course.name }} <span *ngIf="isEven">(EVEN-INDEX)</span>
+  </li>
+</ul>
+
+<!-- Change detection for ngFor -->
+<button (click)="onAdd()">Add</button>
+<!-- onAdd() is a function/method written in the file app,component.ts export-->
+<ul>
+  <li *ngFor="let course of courses">
+    {{ course.name }}
+    <button (click)="removeButton(course)">Remove</button>
+    <!-- must pass a variable TO the function to be able to specify which item to act on! -->
+    <button (click)="modifyContent(course)">Update/Modify</button>
+    <!-- must pass a variable TO the function to be able to specify which item to act on! -->
+  </li>
+</ul>
+
+
+<!-- "trackBy"  ONLY for LARGE lists -->
+
+<button (click)="loadLectures()">Load Lectures</button>
+<ul style="list-style: none;">
+  <!-- <li *ngFor="let lecture of lectures"> -->
+  <!--  ";trackBy: trackCourse" IS TO REDUCE MEMORY/RESOURCE when dealing with LARGE lists
+        use ONLY for LARGE lists!!-->
+  <li *ngFor="let lecture of lectures; trackBy: trackCourse">
+    {{ lecture.name }}
+  </li>
+</ul>

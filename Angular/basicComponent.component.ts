@@ -14,8 +14,8 @@ import { Component } from '@angular/core';
 
 // declerator function:
 @Component({
-  selector: 'courses',
-  // so select from the HTML: <courses>
+  selector: 'courses',                     //<<<----  THIS SELECTOR NEEDS TO GO IN THE app.component.html  as "<courses>" in this case to display in the browser
+  // so select from the HTML: <courses>    // IF YOU CHANGE OR ADD COMPONENTS TO YOUR FILE YOU MUST KEEP CHANGING what is in the app.component.html
   // the line will be:
   // selector: 'courses'
 

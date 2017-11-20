@@ -1,0 +1,54 @@
+<!--
+To get all of the below in online line type:
+div.panel.panel-default>div.panel-heading+div.panel-body
+then press TAB
+this gives:
+
+<div class="panel panel-default">
+  <div class="panel-heading"></div>
+  <div class="panel-body"></div>
+</div>
+
+
+Note parent versus sibling divs  with   >  or  +
+
+Can do multiple repeats with (element)*multiple
+ex: (li)*3
+
+-->
+
+div.panel.panel-default>div.panel-heading+div.panel-body
+
+<div class="panel panel-default">
+  <div class="panel-heading"></div>
+  <div class="panel-body"></div>
+</div>
+
+ul>li :
+<ul>
+  <li></li>
+</ul>
+
+
+ul>(li)*3 :
+
+<ul>
+  <li></li>
+  <li></li>
+  <li></li>
+</ul>
+
+<!-- Special note: to have no bullets in the list: -->
+<!-- <ul> -->
+<ul style="list-style: none;">
+
+
+
+input[type='text'].form-control   gives:
+
+<input type="text" class="form-control">
+
+
+div.form-group>label[for='comment']+textarea[id='comment'].form-control  gives:
+
+<div class="form-group"><label for="comment"></label><textarea name="" id="comment" cols="30" rows="10" class="form-control"></textarea></div>

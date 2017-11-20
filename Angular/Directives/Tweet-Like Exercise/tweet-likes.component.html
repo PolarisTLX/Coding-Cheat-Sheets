@@ -1,0 +1,28 @@
+<span
+  class="glyphicon"
+  [class.glyphicon-heart]="isSelected"
+  [class.glyphicon-heart-empty]="!isSelected"
+  [style.color]="isSelected ? 'deeppink' : '#ccc'"
+  (click)="onClick()"
+  >
+</span>
+{{ likesCount }}
+
+
+<!-- SIMPLER EXAMPLE just for STYLE -->
+
+<button
+  [style.color]="canSave ? 'blue': 'gray'"
+  [style.backgroundColor]="canSave ? 'white': 'red'"
+  [style.fontWeight]="canSave ? 'bold': 'normal'"
+>Save</button>
+
+<!-- Can be further simplified for when there are many conditions and styles to apply: -->
+
+<button
+  [ngStyle]="{
+              'color': canSave ? 'blue': 'gray',
+    'backgroundColor': canSave ? 'white': 'red',
+         'fontWeight': canSave ? 'bold': 'normal'
+  }"
+>Save</button>
