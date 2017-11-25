@@ -7,7 +7,7 @@
 
 
 TO CREATE A NEW ANGULAR PROJECT:
-exanple: in CP type:  ng new  hello-world
+example: in CP type:  ng new  hello-world
 
 
 ALSO NEED TO INSTALL TYPESCRIPT:

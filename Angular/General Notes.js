@@ -1,23 +1,3 @@
-2 types of forms in Angular:
-
-Template-driven forms:  better for simple forms with simple validation
-
-Reactive forms: Gives you more control over validation logic
-Good for complex forms
-Unit Testable
-
-validators in template driven forms, use HTML5 validators
-but reactive forms do not
-
-they use, in the .ts file:
-Validators.required
-Validators.minLength(#)
-Validators.maxLength(#)
-Validators.pattern
-Validators.email
-(check spelling of these, different in the .ts file versus all small-caps in the .html file)
-
-
 
 to use a fake back-end server to test:
 jsonplaceholder.typicode.com
@@ -54,3 +34,12 @@ if you get a failed call to the server, this will retry however many times you w
 this saves you many lines of code which would need for loops etc.
 
 You can always convert an obserable into a promise if you absolutely need to
+
+<---LINTER for Angular (built-in)--->
+(NOTE I actually prefer just the lints I added myself to atom than these details below)
+
+in the file tslint.json you can configure the way your code editor prompts you to use certainstyling
+example, alway use "" insetad of ''.
+can type in CP: "ng lint" to see all errors that dont conform to the styles you established in tslint.json
+then in CP type:  "ng lint --fix" to automaticaly fix many of the small errors
+the type in CP: "ng lint" again to see what errors are left
