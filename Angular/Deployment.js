@@ -31,3 +31,9 @@ used in larger organisations, slower to get started.
 -to deplay to github pages, type in CP:
 "angular-cli-ghpages"  or "ngh" (same but shorthand?)
 -it should now be up on GH-Pages
+
+a short it seems is to go to file package.json
+in "scripts" section, add a new line:
+"deploy:gh": "ng build --prod --base-href='https://polaristlx.github.io/Portfolio/' && ngh"
+
+then in CP type:  npm run deploy:gh
