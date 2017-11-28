@@ -103,3 +103,53 @@ Operator Order Of Precence / order of execution:
 ||  has the lowest precedence (executed last)
 
 (paretheses)  -->   "* / %"  -->  "+ -"    -->   (comparisons (>, >=, ==, != ..)  -->   &&   -->   ||
+
+
+
+When you call on a variable that has not been assigned a value, it returns "undefined"
+var tricycle = 3;
+console.log(tricycle); // 3
+var bicycle;
+console.log(bicycle); // undefined
+
+defining multiple values at a time with one statement, simply use a comma:
+var one = 1, two = 2, three = 3;
+
+
+//Not very useful?
+an alternative to the browser popup "alert("good morning");"
+can be confirm("Do you accept?");  //this has a pop up with TWO buttons, Cancel and ok
+can be prompt("How do you plea?", "...");  //this is same as Confirm, but with a text input field first
+
+var pickedNumber = Number(prompt("Pick a number", ""));
+alert("Your number x 3 is: " + pickedNumber * 3);
+
+Only doing this if the number typed is a valid number:
+if(!isNaN(pickedNumber));
+if(!isNaN(pickedNumber)) { alert("That's a valid number!"); } else { alert("That's not a valid number!"); }
+
+curly braces {}  they are ACTUALLY only needed if an if or else statement has more than one statement to perform.
+most use them at all times since you may need to add more statements later, thus would need to add curly braces.
+
+
+
+do/while loop is basically a while loop that will perform the first action at least once, regardless of if a further condition is met or not.
+This example will prompt once, and then keep prompting until the user provides a response:
+    do {
+      var yourName = prompt("Who are you");
+    } while (!yourName);
+    console.log(yourName);
+
+
+// looking at the for loop, you can take out the middle state as so if you like. It does the same thing:
+// (not that it's desireable)
+for (var current = 20; current % 7 ==0; current++) {
+}
+console.log(current);
+// OR :
+for (var current = 20; ; current++) {
+  if (current % 7 == 0)
+    break;
+}
+console.log(current);
+// → 21
