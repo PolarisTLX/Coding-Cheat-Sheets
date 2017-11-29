@@ -121,13 +121,70 @@ https://devcenter.heroku.com/articles/heroku-cli
 
 -need to commit our changes to git:
   -in CP type: "git add ."
-  -then type: "git commit -m "Prepare for heroku""
-  -then type: "heroku create "  //not sure of this ones
+  -then type: "git commit -m "Description of commit (Ex: Prepare for heroku)""
+  -then type: "git push heroku master"
 
--need to add heorku as a remote:
+
+
+Precautionary step: Engines:
+-in the package.json add:
+      "engines": {
+        "node": "6.11.0",
+        "npm": "5.5.1"
+      }
+-check first to see what version of node and npm you are running
+ by typing in CP: "node --version" and "npm --version"
+ and make sure those numbers are what is above.
+
+
+
+Steps below seemed to not be needed when I made sure that my app was completely by itself in its own repository.
+
+
+-need to add heroku as a remote:
   -in CP type: "heroku git:remote -a heroku-app-name"  //this only works with "Heroku Toolbelt"?
      Ex: "polaris-first-angular"
   -then type: "git push heroku master"
   -if that doesnt work (needs Heroku Toolbelt?) then do this:
      -type: "git remote add heroku git@heroku.com:heroku-app-name.git"
      Ex: git remote add heroku git@heroku.com:polaris-first-angular.git
+
+
+
+
+ERROR RESOLUTIONS:
+
+https://devcenter.heroku.com/articles/keys
+
+A common key error is: Permission denied (publickey). You can fix this by using keys:add to notify Heroku of your new key. Or by using http-git.
+
+In order to run these commands on a Windows machine, run the Git Bash application. A shortcut for this application should be on your desktop, installed as part of the Heroku CLI.
+
+To generate a public key:
+$ "ssh-keygen -t rsa"
+        Generating public/private rsa key pair.
+        Enter file in which to save the key (/Users/adam/.ssh/id_rsa):
+        Enter passphrase (empty for no passphrase):
+        Enter same passphrase again:
+        Your identification has been saved in /Users/adam/.ssh/id_rsa.
+        Your public key has been saved in /Users/adam/.ssh/id_rsa.pub.
+        The key fingerprint is:
+        a6:88:0a:0b:74:90:c6:e9:d5:49:d6:e3:04:d5:6c:3e adam@workstation.local
+Press enter at the first prompt to use the default file location. Next, type a secure passphrase for the key.
+
+Adding keys to Heroku
+Upload your key to heroku with:
+"heroku keys:add"
+
+
+ERROR:
+
+No default language could be detected for this app.
+			HINT: This occurs when Heroku cannot detect the buildpack to use for this application automatically.
+			See https://devcenter.heroku.com/articles/buildpacks
+
+Setting a buildpack on an application
+You can change the buildpack used by an application by setting the buildpack value. When the application is next pushed, the new buildpack will be used.
+$ "heroku buildpacks:set heroku/nodejs"
+    Buildpack set. Next release on random-app-1234 will use heroku/php.
+    Run `git push heroku master` to create a new release using this buildpack.
