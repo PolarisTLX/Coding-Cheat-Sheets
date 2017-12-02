@@ -101,7 +101,6 @@ true     propsInA = 2 & propsInB = 2
 */
 
 
-
 //to explain it from Stack Overflow:
 /*
 It's checking to make sure that the property it's found in b is also a property in a, and that the values of both properties are the same.
@@ -117,4 +116,5 @@ pseudo code:
   }
 
   goDeeper('/'); // It will go through all the filesystem, and each time it finds an end it
+  //NOTE I don't think that the "/" is applicable to the book's exercise, is it's not actually folders.
 */

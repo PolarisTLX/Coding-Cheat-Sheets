@@ -1,4 +1,4 @@
-Many languages will stop you, or at least warn you,
+Many languages will stop +, or at least warn you,
 when you are defining a variable with a name that is already taken.
 JavaScript does not, so need to be careful.
 
@@ -453,3 +453,196 @@ console.log(window.myVar);
 //  10
 console.log("myVar" in window);
 //  true
+
+
+FOR EACH:
+forEach() is a standard method available for arrays.
+Since the array is already provided as the thing the method acts on,
+forEach takes only one required argument: the function() to be executed for each element.
+
+      var numbers = [1, 2, 3, 4, 5], sum = 0;
+      forEach(numbers, function(number) {
+        sum += number;
+      });
+      console.log(sum);
+      // → 15
+
+
+HIGHER-ORDER FUNCTIONS:
+.forEach() .map() .filter() .reduce() etc.
+Writting functions for simple actions are not much worse without higher-order functions
+like .reduce(). But higher-order functions start to shine when the actions get more complicated.
+Such as when you need to "compose" functions.
+
+Higher-order functions that somehow apply a function to the elements of an array
+are widely used in JavaScript.
+The .forEach() method is the most primitive such function(){}.
+There are a number of other variants available as methods on arrays.
+
+
+APPLY METHOD TO PASS ARGUMENTS:
+JavaScript functions have a .apply() method.
+You pass it an array (or array-like object) of arguments,
+and it will call the function with those arguments.
+
+function transparentWrapping(f) {
+ return function() {
+   return f.apply(null, arguments);
+ };
+}
+
+That’s a useless function, but it shows the pattern we are interested in:
+The function(){} it returns passes all of the given arguments, and only those arguments, to f.
+It does this by passing its own arguments object to apply.
+The first argument to apply, for which we are passing null here, can be used to simulate a method call.
+
+
+JSON:
+
+in JSON, All property names have to be surrounded by double quotes,
+and only simple data expressions are allowed—
+//no function calls, variables, or anything that involves actual computation.
+Comments are not allowed in JSON.
+
+JavaScript gives us functions, JSON.stringify and JSON.parse,
+that convert data to and from this format.
+JSON.stringify takes a JavaScript value and returns a JSON-encoded string.
+JSON.parse takes such a string and converts it to the value it encodes.
+
+    var string = JSON.stringify({name: "X", born: 1980});
+    console.log(string);
+    // → {"name":"X","born":1980}
+    console.log(JSON.parse(string).born);
+    // → 1980
+
+
+
+FILTER: .filter():
+
+To find the people in the ancestry data set who were young in 1924,
+the following function filters out the elements in an array that don’t pass a test.
+
+function filter(array, test) {
+  var passed = [];
+  for (var i = 0; i < array.length; i++) {
+    if (test(array[i]))
+      passed.push(array[i]);
+  }
+  return passed;
+}
+
+console.log(filter(ancestry, function(person) {
+  return person.born > 1900 && person.born < 1925;
+}));
+// → [{name: "Philibert Haverbeke", …}, …]
+
+
+This uses the argument named test, a function value, to fill in a “gap” in the computation.
+The test function is called for each element,
+and its return value determines whether an element is included in the returned array.
+
+
+
+A "PURE" function does not modify the array(/data?) it is given.
+
+MAP:  .map()
+The map method transforms an array by applying a function to all of its elements
+and building a new array from the returned values.
+The new array will have the same length as the input array,
+but its content will have been “mapped” to a new form by the function(){}.
+
+      var numbers = [4, 9, 16, 25];
+      console.log(numbers.map(Math.sqrt));
+      // [2, 3, 4, 5]
+
+REDUCE: .reduce()
+.reduce() (or sometimes fold) is a higher-order operation.
+That "folds" up an array, one element at a time, till there is just 1 item left.
+When summing numbers, you’d start with the number zero and, for each element,
+combine it with the current sum by adding the two.
+
+This function is a little less straightforward than filter and map, so pay close attention.
+
+The parameters to the reduce function are:
+The array, A combining function and A start value:
+
+.reduce(array, combiningFunction, start)
+or
+array.reduce(combiningFunction, start)
+
+If your array contains at least one element, you are allowed to leave off the start argument.
+The method will take the first element of the array as its start value and start reducing at the second element.
+
+
+To use reduce to find my most ancient known ancestor, we can write something like this:
+
+      var numbers = [65, 44, 12, 4];
+
+      function getSum(total, num) {
+        return total + num;
+      }
+
+      console.log(numbers.reduce(getSum));  // 125
+
+      // shortened with function incorporated:
+      console.log(numbers.reduce(function(total, num) {
+        return total + num;
+      }));
+
+
+      //another example:
+      console.log(ancestry.reduce(function(min, cur) {
+        if (cur.born < min.born) return cur;
+        else return min;
+      }));
+      // → {name: "Pauwels van Haverbeke", born: 1535, …}
+
+
+COMBINED ARRAY HIGHER-ORDER FUNCTIONS EXAMPLE:
+Example code that finds the average age for men and for women in a provided data set "ancestry".
+Below we created 4 core functions: average, age, male, female
+
+    var ancestry = [
+      {"name": "Emma de Milliano", "sex": "f",
+       "born": 1876, "died": 1956,
+       "father": "Petrus de+ Milliano",
+       "mother": "Sophia van Damme"},
+      {"name": "Carolus Haverbeke", "sex": "m",
+       "born": 1832, "died": 1905,
+       "father": "Carel Haverbeke",
+       "mother": "Maria van Brussel"}
+    ];
+
+    //not all data put here
+
+    // function average(array) {
+    //   function plus(a, b) { return a + b; }
+    //   return array.reduce(plus) / array.length;
+    // }
+    function average(array) {
+      return array.reduce(function(a, b) {
+        return a + b; }
+      ) / array.length;
+    }
+
+    function age(p) { return p.died - p.born; }
+    function male(p) { return p.sex == "m"; }
+    function female(p) { return p.sex == "f"; }
+
+    console.log(average(ancestry.filter(male).map(age)));
+    // → 61.67 (not all data provided in this example)
+    console.log(average(ancestry.filter(female).map(age)));
+    // → 54.56 (not all data provided in this example)
+
+    // //NOTE that the "array" at teh top is actually:
+    // ancestry.filter(male).map(age)
+    //
+    // could put it all into one thing if desired:
+    //
+    // var array = ancestry.filter(male).map(age);
+    //
+    // console.log(array.reduce(function(a, b) {
+    //     return a + b;
+    //   }) / array.length;
+    // );
+    //
