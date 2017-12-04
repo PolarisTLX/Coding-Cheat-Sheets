@@ -57,76 +57,54 @@ You can use the average function defined earlier in this chapter.
 Note that not all the mothers mentioned in the data are themselves present in the array.
 The byName object, which makes it easy to find a person’s object from their name, might be useful here.
 
-//provided:
-        function average(array) {
-          function plus(a, b) { return a + b; }
-          return array.reduce(plus) / array.length;
-        }
-
-        var byName = {};
-
-        ancestry.forEach(function(person) {
-          byName[person.name] = person;
-        });
-
 //ANSWER = 31.2
 
-Step 0: convert the json file to an object with
-    var ancestry = JSON.parse(ANCESTRY_FILE);
+//provided (earlier in chapter): convert the json file to an array
+var ancestry = JSON.parse(ANCESTRY_FILE);
 
-Step 1: Create empty array ageDiff = [];
-Step 2: for every name, take the "born",  this is "childAge"
-step 3: then search in that same object their "mother": "name"
-Step 4: search in the array for that "mother":"name" then that "born", this is "motherAge"
-step 5: if that "mother": "name" does not exist, move onto the next, back to step 2.
-Step 6: subtract "motherAge" - "childAge" and push that number to "ageDiff" array.
-Step 7: reduce "ageDiff" array to become the average of all teh entries
 
+//My solution:
 
 var ageDiff = [];
 
-for (i = 0; i < ancestry.length; i++) {
+// for (i = 0; i < ancestry.length; i++) {
+for (i in ancestry) {
+  //reset the variables for each loop
+  var childAge;
+  var motherName;
+  var motherAge;
   //if they have a mother listed:
   if (ancestry[i].mother != null) {
-      var childAge = ancestry[i].born;
-      var motherName = ancestry[i].mother;
-      var motherAge;
+      childAge = ancestry[i].born;
+      motherName = ancestry[i].mother;
 
-      //get the mother's age:
-      for(var j=0; j<ancestry.length; j++) {
-        for(name in ancestry[j]) {
+      //look for mother in the array
+      // for(j = 0; j < ancestry.length; j++) {
+      for(j in ancestry) {
           if(ancestry[j].name.indexOf(motherName)!=-1) {
+            // if she exists, get her age:
             motherAge = ancestry[j].born;
+            ageDiff.push(childAge - motherAge);
           }
-        }
-      }
-
-      //if the mother was not present in the list, she did not return an age, so do not do anything
-      if (motherAge != null) {
-        ageDiff.push(childAge - motherAge);
       }
   }
 }
 
+//provided
 function average(array) {
   function plus(a, b) { return a + b; }
   return array.reduce(plus) / array.length;
 }
 
 console.log(average(ageDiff));
-//my answere returns  18.21, hmmm
+//my answere returns  31.22 !!
 
 
 
-//Actual solution:
-    function average(array) {
-      function plus(a, b) { return a + b; }
-      return array.reduce(plus) / array.length;
-    }
+// More elegant solution using higher-order functions:
 
-
-//THIS REFORMATS THE "ancestry" ARRAY into an OBJECT
-//MAKING IT EASIER TO WORK WITH
+    //THIS REFORMATS THE "ancestry" ARRAY into an OBJECT
+    //MAKING IT EASIER TO WORK WITH?
     var byName = {};
     ancestry.forEach(function(person) {
       byName[person.name] = person;
@@ -134,8 +112,16 @@ console.log(average(ageDiff));
 
     var differences = ancestry.filter(function(person) {
       return byName[person.mother] != null;
+      //this .filter() removes all entries who don't have a mother listed
     }).map(function(person) {
       return person.born - byName[person.mother].born;
+      //this .map() converts all entries in just the result of (age - mother's age)
     });
+
+    //provided
+    function average(array) {
+      function plus(a, b) { return a + b; }
+      return array.reduce(plus) / array.length;
+    }
 
     console.log(average(differences));
