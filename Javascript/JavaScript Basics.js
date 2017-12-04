@@ -646,3 +646,11 @@ Below we created 4 core functions: average, age, male, female
     //   }) / array.length;
     // );
     //
+
+
+    A program that processes an array is most elegantly expressed as a sequence of cleanly separated steps that each do something with the array and produce a new array. But building up all those intermediate arrays is somewhat expensive.
+
+    Likewise, passing a function(){} to forEach and letting that method handle the array iteration for us is convenient and easy to read. But function calls in JavaScript are costly compared to simple loop bodies.
+
+
+OTHER METHODS: .apply() and .bind() ???
