@@ -1,3 +1,10 @@
+GLOBAL STANDARD METHODS IN JAVASCRIPT:
+OTHER METHODS: .apply(){} and .bind() and .call() ???
+JavaScript isNaN() Function  - Checks whether a value is NaN.
+
+
+
+
 Many languages will stop +, or at least warn you,
 when you are defining a variable with a name that is already taken.
 JavaScript does not, so need to be careful.
@@ -653,4 +660,29 @@ Below we created 4 core functions: average, age, male, female
     Likewise, passing a function(){} to forEach and letting that method handle the array iteration for us is convenient and easy to read. But function calls in JavaScript are costly compared to simple loop bodies.
 
 
-OTHER METHODS: .apply() and .bind() ???
+GLOBAL STANDARD METHODS IN JAVASCRIPT:
+OTHER METHODS: .apply(){} and .bind() and .call() ???
+JavaScript isNaN() Function  - Checks whether a value is NaN.
+
+
+
+
+Functions derive from Function.prototype, and arrays derive from Array.prototype. objects derive from Object.prototype
+All functions) automatically get a property named prototype, which by default holds a plain, empty object that derives from Object.prototype.
+
+
+CONSTRUCTORS:
+NOTE constructors are functions
+A more convenient way to create objects that derive from some shared prototype is to use a constructor. In JavaScript, calling a function with the new keyword in front of it causes it to be treated as a constructor. The constructor will have its this variable bound to a fresh object, and unless it explicitly returns another object value, this new object will be returned from the call.
+NOTE: The actual prototype of a constructor is Function.prototype since constructors are functions.
+
+An object created with "new" is said to be an instance of its constructor.
+
+
+
+DEFINITIONS (will try to get most in one place):
+
+  encapsulation: (distinguishing between internal complexity and external interface). One of several concepts for objects in object oriented programming, as the interface of an object is usually simpler in complexity then its internal content
+
+  Methods: simply properties that hold functn values
+  Usually a method needs to do something with the object it was called on. When a function is called as a method—looked up as a property and immediately called, as in object.method()—the special variable this in its body will point to the object that it was called on.

@@ -2,22 +2,23 @@ Standard methods on Array:
 
 https://www.w3schools.com/jsref/jsref_obj_array.asp
 
+.forEach()   Calls a function(){} for each array element
 .reverse()
-.forEach()
+.sort()
+.join()
 .filter()
 .map()
 .reduce()
-.join()
 .find()
 .findIndex()
 .indexOf()
-
+.every()	Checks if every element in an array pass a test
+.some()	Checks if any of the elements in an array pass a test
 
 
 .push() and .pop(), which add and remove elements at the end of an array,
 The methods for adding and removing things at the START of an array are
 .unshift() and .shift().
-
 
 
 .slice(), takes a start index and an end index and returns an array that has only the elements between those indices.
@@ -29,7 +30,7 @@ console.log([0, 1, 2, 3, 4].slice(2));
 // → [2, 3, 4]
 
 
-The .concat() method can be used to glue arrays together, similar to what the + operator does for strings.
+.concat() method can be used to glue arrays together, similar to what the + operator does for strings.
 
 
 
