@@ -24,15 +24,18 @@ The methods for adding and removing things at the START of an array are
 .slice(), takes a start index and an end index and returns an array that has only the elements between those indices.
 The start index is inclusive, the end index exclusive.
 
-console.log([0, 1, 2, 3, 4].slice(2, 4));
-// → [2, 3]
-console.log([0, 1, 2, 3, 4].slice(2));
-// → [2, 3, 4]
+    console.log([0, 1, 2, 3, 4].slice(2, 4));
+    // → [2, 3]
+    console.log([0, 1, 2, 3, 4].slice(2));
+    // → [2, 3, 4]
 
 
 .concat() method can be used to glue arrays together, similar to what the + operator does for strings.
 
-
+.toString() using this on an array gives a result similar to calling .join(",")
+it puts commas between the values in the array.
+    console.log([1, 2].toString());
+    // → 1,2
 
 FOR EACH:
 forEach() is a standard method available for arrays.
