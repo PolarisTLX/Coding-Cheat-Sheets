@@ -1,6 +1,9 @@
 Sequence interface - Eloquent JavaScript Chapter 6 - Objects - Exercise 3
 
 Design an interface that abstracts iteration over a collection of values.
+
+Interface just means a functin. And in this case it just iterates over the values privided to it.
+
 An object that provides this interface represents a sequence, and the interface
 must somehow make it possible for code that uses such an object to
 iterate over the sequence, looking at the element values it is made up of
@@ -71,10 +74,12 @@ ArraySeq.prototype.next = function() {
   if (this.pos >= this.array.length - 1) {
     return false;
   }
+  //otherwise return true, and keep logging in the logFive function
   this.pos++;
   return true;
 };
 ArraySeq.prototype.current = function() {
+  // provide the value at the current position in the array, which is what will be logged
   return this.array[this.pos];
 };
 
@@ -83,8 +88,10 @@ ArraySeq.prototype.current = function() {
 function RangeSeq(from, to) {
   this.pos = from -1;
   this.to = to;
+  //start at -1 from first value, because it will be ++1 below before the first console.log
 }
-//if there are no more elements, next will return false, stopping the logFive function
+//if the range doesn't make sense (from is larger than to),
+// of if there are no more elements, next will return false, stopping the logFive function
 RangeSeq.prototype.next = function() {
   if (this.pos >= this.to) {
     return false;
@@ -92,6 +99,7 @@ RangeSeq.prototype.next = function() {
   this.pos++;
   return true;
 };
+// provide the current value, which is what will be logged
 RangeSeq.prototype.current = function() {
   return this.pos;
 };
