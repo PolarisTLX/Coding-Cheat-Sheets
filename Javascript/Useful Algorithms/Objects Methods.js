@@ -25,7 +25,10 @@ The “proto” rabbit acts as a container for the properties that are shared by
 BUT!!!  A better way is to use "new", like  var Toyata = new car();
 
 CONSTRUCTORS:
-NOTE constructors are functions
+Constructors are functions that can be used with the new operator to create new objects.
+The new object’s prototype will be the object found in the prototype property of the constructor function.
+Constructors names usually start with a capital letter.
+
 A more convenient way to create objects that derive from some shared prototype is to use a constructor. In JavaScript, calling a function with the new keyword in front of it causes it to be treated as a constructor. The constructor will have its this variable bound to a fresh object, and unless it explicitly returns another object value, this new object will be returned from the call.
 NOTE: The actual prototype of a constructor is Function.prototype since constructors are functions.
 
@@ -155,7 +158,7 @@ If you have concerns when looping about which properties will be included, write
 
 If we want to create an object without a prototype to avoid some of this hassle
 use Object.create(null):
-the Object.create function, allows us to create an object with a specific prototype.
+the Object.create function(){}, allows us to create an object with a specific prototype.
 But you are also allowed to pass "null" as the prototype to create a fresh object with no prototype.
 
     var store = Object.create(null);
@@ -167,4 +170,128 @@ But you are also allowed to pass "null" as the prototype to create a fresh objec
 
 This way there is no longer the need for "hasOwnProperty"
 because all the properties the object has are its own properties.
-And now can safely use for/in loops,
+And now can safely use for/in loops.
+
+
+IMPORTANT:
+The standard Object.keys function(){} returns an array of property names in an object.
+
+
+PLYMORPHISM:
+One of the CORE PRINCIPALS of Object Oriented Programming (OOP).
+It is the practice of designing objects to share behaviors
+and to be able to override shared behaviors with specific ones.
+Polymorphism takes advantage of inheritance in order to make this happen.
+
+Example: When you call the String functin, which converts a value to a string,
+on an object, it will call the .toString() method on that object to try to create a meaningful string to return.
+
+Some of the standard prototypes define their own version of .toString()
+so they can create a string that contains more useful information than "[object Object]".
+When a piece of code is written to work with objects that have a certain interface—
+in this case, a .toString() method, any kind of object that happens to support this interface
+can be plugged into the code, and it will just work.
+
+Polymorphic code can work with values of different shapes,
+as long as they support the interface it expects.
+
+
+POLYMORPHISM TABLE EXAMPLE made into its own file
+
+
+GETTERS AND SETTERS:
+
+With JavaScript we can specify properties that, from the outside,
+look like normal properties but secretly have methods associated with them.
+
+In an object literal, the "get" or "set" notation for properties allows you to specify
+a functin to be run when the property is read("get") or written("set").
+
+var pile = {key: value, get(){}, set(){}};
+var pile = {key: value, get property(){code when evoked}, set property(value given){code when evoked}};
+
+    var pile = {
+      elements: ["eggshell", "orange peel", "worm"],
+      get height() {
+        return this.elements.length;
+      },
+      set height(value) {
+        console.log("Ignoring attempt to set height to", value);
+      }
+    };
+
+    console.log(pile.height);  // THIS IS "GET"
+    // → 3
+    pile.height = 100;         // THIS IS "SET"
+    // → Ignoring attempt to set height to 100
+
+
+When a "get" is defined but no "set", writing (setting) to the property is simply ignored.
+
+
+You can also add such a property to an existing object, for example a prototype,
+using the Object.defineProperty function (which we previously used to create nonenumerable properties).
+
+    Object.defineProperty(TextCell.prototype, "heightProp", {
+      get: function() { return this.text.length; }
+    });
+
+    var cell = new TextCell("no\nway");
+    console.log(cell.heightProp);
+    // → 2
+    cell.heightProp = 100;   //there is no "set" so nothing happens
+    console.log(cell.heightProp);
+    // → 2
+You can use a similar set property, in the object passed to defineProperty, to specify a setter method.
+
+
+ENCAPSULATION:
+Distinguishing between internal complexity and external interface.
+INTERFACE: can be a method/functin that is called on to intereact with a more complex object
+
+One of several concepts for objects in object oriented programming,
+as the interface of an object is usually simpler in complexity then its internal content
+
+Its can be a useful thing to do with objects is to specify an interface for them
+and tell everybody that they are supposed to talk to your object only through that interface.
+The rest of the details that make up your object are now encapsulated, hidden behind the interface.
+
+Once you are talking in terms of interfaces, who says that only one kind of object may implement this interface?
+Having different objects expose the same interface
+and then writing code that works on any object with the interface is called polymorphism.
+It is very useful.
+
+
+INHERITANCE:
+To avoid writting a whole new constructor with all three methods,
+we can do something clever, because prototypes may themselves have prototypes:
+
+Inheritance allows us to build slightly different data types from existing data types with relatively little work.
+
+RTextCell becomes basically equivalent to a TextCell,
+except that its draw method contains a different functin.
+
+NOTE:  inheritance is often confused with polymorphism.
+inheritance fundamentally ties types together, and can creat tangle in your code.
+You should see it as a slightly dodgy trick that can help you define new types with little code
+A preferable way to extend types is through composition (see UnderlinedCell in the Polymorphic Table exercise).
+
+
+
+THE INSTANCE OF OPERATOR:
+Find out if an object is derived/inherited from another constructor.
+
+It is occasionally useful to know whether an object was derived from a specific constructor.
+For this, JavaScript provides a binary operator called instanceof.
+
+
+    console.log(new derivedObject("argument") instanceof originConstructor);
+    // true or false
+    console.log(new RTextCell("A") instanceof RTextCell);
+    // → true
+    console.log(new RTextCell("A") instanceof TextCell);
+    // → true
+    console.log(new TextCell("A") instanceof RTextCell);
+    // → false
+    console.log([1] instanceof Array);
+    // → true

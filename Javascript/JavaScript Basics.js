@@ -676,7 +676,7 @@ NOTE constructors are functions
 A more convenient way to create objects that derive from some shared prototype is to use a constructor. In JavaScript, calling a function with the new keyword in front of it causes it to be treated as a constructor. The constructor will have its this variable bound to a fresh object, and unless it explicitly returns another object value, this new object will be returned from the call.
 NOTE: The actual prototype of a constructor is Function.prototype since constructors are functions.
 
-An object created with "new" is said to be an instance of its constructor.
+An object created with "new" is said to be an instance of its constructor(){}.
 
 
 
@@ -685,4 +685,10 @@ DEFINITIONS (will try to get most in one place):
   encapsulation: (distinguishing between internal complexity and external interface). One of several concepts for objects in object oriented programming, as the interface of an object is usually simpler in complexity then its internal content
 
   Methods: simply properties that hold functn values
-  Usually a method needs to do something with the object it was called on. When a function is called as a method—looked up as a property and immediately called, as in object.method()—the special variable this in its body will point to the object that it was called on.
+  Usually a method needs to do something with the object it was called on. When a functin is called as a method—looked up as a property and immediately called, as in object.method()—the special variable this in its body will point to the object that it was called on.
+
+
+FUNDAMENTALS OF OOP OBJECT ORIENT PROGRAMING:
+-Encapsulation
+-Polymorphism
+-Inheritance
