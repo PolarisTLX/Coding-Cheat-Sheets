@@ -692,3 +692,46 @@ FUNDAMENTALS OF OOP OBJECT ORIENT PROGRAMING:
 -Encapsulation
 -Polymorphism
 -Inheritance
+
+
+
+"THIS" IN A FUNCTION:
+When a functin isn’t called as a method, this will refer to the global object.
+This is a bit of a flaw in ES5, but fixed in ES6?
+There are workarounds. A common pattern is to say var self = this and from then on refer to self,
+which is a normal variable and thus visible to inner functions.
+Another solution is to use the bind method, which allows us to provide
+an explicit this object to bind to.
+
+    var test = {
+      prop: 10,
+      addPropTo: function(array) {
+        return array.map(function(elt) {
+          return this.prop + elt;
+        }.bind(this));
+      }
+    };
+    console.log(test.addPropTo([5]));
+
+The function passed to map is the result of the bind call and thus has
+its this bound to the first argument given to bind—the outer functin’s this value
+(which holds the test object).
+
+Most standard higher-order methods on arrays, such as forEach and map,
+take an optional second argument that can also be used to provide a this
+for the calls to the iteration function.
+So you could express the previous example in a slightly simpler way:
+
+    var test = {
+      prop: 10,
+      addPropTo: function(array) {
+        return array.map(function(elt) {
+          return this.prop + elt;
+        }, this); // ← no bind, note the comma
+      }
+    };
+    console.log(test.addPropTo([5]));
+    // → [15]
+
+This works only for higher-order functions that support such a context parameter.
+When they don’t, you’ll need to use one of the other approaches.

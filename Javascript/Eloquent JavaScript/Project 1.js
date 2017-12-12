@@ -2,6 +2,22 @@ Eloquent JavaScript
 Project 1 - Electronic lifetimes
 
 
+Define a world with a "plan"
+
+      var plan = ["############################",
+                  "#      #    #      o      ##",
+                  "#                          #",
+                  "#          #####           #",
+                  "##         #   #    ##     #",
+                  "###           ##     #     #",
+                  "#           ###      #     #",
+                  "#   ####                   #",
+                  "#   ##       o             #",
+                  "# o  #         o       ### #",
+                  "#    #                     #",
+                  "############################"];
+
+
 The grid that models the world using a fixed H & W:
 
     function Vector(x, y) {
@@ -194,8 +210,183 @@ every character will have a constructor, except for the empty space character, w
 
 
   first attempt a creating a world:
+  // this outputted string is will be very similar to the plan that was started with at the beginning of the project
 
       var world = new World(plan, {"#": Wall,
                                    "o": BouncingCritter});
 
       console.log(world.toString());
+        ############################
+        #      #    #      o      ##
+        #                          #
+        #          #####           #
+        ##         #   #    ##     #
+        ###           ##     #     #
+        #           ###      #     #
+        #   ####                   #
+        #   ##       o             #
+        # o  #         o       ### #
+        #    #                     #
+        ############################
+
+
+"THIS" IN A FUNCTION:
+When a functin isn’t called as a method, this will refer to the global object.
+This is a bit of a flaw in ES5, but fixed in ES6?
+There are workarounds. A common pattern is to say var self = this and from then on refer to self,
+which is a normal variable and thus visible to inner functions.
+Another solution is to use the bind method, which allows us to provide
+an explicit this object to bind to.
+
+    var test = {
+      prop: 10,
+      addPropTo: function(array) {
+        return array.map(function(elt) {
+          return this.prop + elt;
+        }.bind(this));
+      }
+    };
+    console.log(test.addPropTo([5]));
+
+The function passed to map is the result of the bind call and thus has
+its this bound to the first argument given to bind—the outer functin’s this value
+(which holds the test object).
+
+Most standard higher-order methods on arrays, such as forEach and map,
+take an optional second argument that can also be used to provide a this
+for the calls to the iteration function.
+So you could express the previous example in a slightly simpler way:
+
+    var test = {
+      prop: 10,
+      addPropTo: function(array) {
+        return array.map(function(elt) {
+          return this.prop + elt;
+        }, this); // ← no bind, note the comma
+      }
+    };
+    console.log(test.addPropTo([5]));
+    // → [15]
+
+This works only for higher-order functions that support such a context parameter.
+When they don’t, you’ll need to use one of the other approaches.
+
+In our own higher-order functions, we can support such a context parameter
+by using the call method to call the functin given as an argument.
+For example, here is a forEach method for our Grid type,
+which calls a given functin for each element in the grid that isn’t null or undefined:
+
+    Grid.prototype.forEach = function(f, context) {
+      for (var y = 0; y < this.height; y++) {
+        for (var x = 0; x < this.width; x++) {
+          var value = this.space[x + y * this.width];
+          if (value != null) {
+            f.call(context, value, new Vector(x, y));
+          }
+        }
+      }
+    };
+
+
+ANIMATING THE CRITTERS:
+
+writing a "turn" method that will go over the grid using the forEach method defined above
+looking for objects with an act method.
+When it finds one, "turn" calls that method to get an action and perform that action if valid.
+
+But need to keep track of which critters have already moved in an array:
+
+    World.prototype.turn = function() {
+      var acted = [];
+      this.grid.forEach(function(critter, vector) {
+        // if the critter has an "act"  && is not in the array "acted" of critters who already moved:
+        if (critter.act && acted.indexOf(critter) == -1) {
+          // now add them to the "acted" array
+          acted.push(critter);
+          // perform their action
+          this.letAct(critter, vector);
+        }
+      }, this);
+    };
+
+We use the second parameter to the grid’s forEach method
+to be able to access the correct this inside the inner functin.
+The letAct method contains the actual logic that allows the critters to move.
+
+The "View" object knows about the world and the critters postion in that world
+
+      World.prototype.letAct = function(critter, vector) {
+        var action = critter.act(new View(this, vector));
+        // for now, only perform is action is "move"
+        if (action && action.type == "move") {
+          // check if distination is a valid direction
+          var dest = this.checkDestination(action, vector);
+          // also if destinatio is an empty space ("null")
+          if (dest && this.grid.get(dest) == null) {
+            // set spot where critter just was to now be empty "null"
+            this.grid.set(vector, null);
+            // move the critter to the new destination
+            this.grid.set(dest, critter);
+          }
+        }
+      };
+
+      // method to check if destination is a valid direction, used above
+      World.prototype.checkDestination = function(action, vector) {
+        if (directions.hasOwnProperty(action.direction)) {
+          var dest = vector.plus(directions[action.direction]);
+          if (this.grid.isInside(dest)) {
+            return dest;
+          }
+        }
+      };
+
+
+
+      function View(world, vector) {
+        this.world = world;
+        this.vector = vector;
+      }
+      // the "look" method figures out what coords we are trying to look at
+      View.prototype.look = function(dir) {
+        var target = this.vector.plus(direction[dir]);
+        // check if they are inside the world grid
+        if (this.world.grid.isInside(target)) {
+          // return that character that sits there
+          return charFromElement(this.world.grid.get(target));
+        } else {
+          // if outside the grid, simply return a wall "#"
+          return "#";
+        }
+      };
+      View.prototype.findAll = function(ch) {
+        var found = [];
+        for (var dir in directions) {
+          if (this.look(dir) == ch) {
+            found.push(dir);
+          }
+        }
+        return found;
+      };
+      View.prototype.find = function(ch) {
+        var found = this.findAll(ch);
+        if (found.length == 0) {
+          return null;
+        }
+        return randomElement(found);
+      };
+
+
+MAKING THE WORLD MOVE:
+
+this method below simple prints out 5 copies of the world one at a time:
+
+      for (i = 0; i < 5; i++) {
+        world.turn();
+        console.log(world.toString());
+      }
+
+
+To better view this, the courses sandbox provides an animateWorld functin:
+
+      animateWorld(world);
