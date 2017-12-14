@@ -1,4 +1,4 @@
-Julius Caesar protected his confidential information by encrypting it in a cipher. Caesar's cipher rotated every letter in a string by a fixed number, k, making it unreadable by his enemies. Given a string, s, and a number, k, encrypt  and print the resulting string.
+/*Julius Caesar protected his confidential information by encrypting it in a cipher. Caesar's cipher rotated every letter in a string by a fixed number, k, making it unreadable by his enemies. Given a string, s, and a number, k, encrypt  and print the resulting string.
 
 Note: The cipher only encrypts letters; symbols, such as -, remain unencrypted.
 
@@ -37,7 +37,7 @@ i (ASCII 105) becomes k (ASCII 107).
  remains the same, as symbols are not encoded. 
 O (ASCII 79) becomes Q (ASCII 81). 
 z (ASCII 122) becomes b (ASCII 98); because z is the last letter of the alphabet, a (ASCII 97) is the next letter after it in lower-case rotation.
-
+*/
 /////////////// this portion is custom code to work with a webinterface, can ignore ////////////////////
 
 process.stdin.resume();
@@ -120,3 +120,10 @@ function main() {
     }
     console.log(newString);    
 }
+
+/*Just some quick feedback:
+
+- Instead of using "magic numbers" such as 25 or 26, you could use the length of your strings.
+
+- Also, instead of using the while loop to handle the case where K is larger than the length of your letters string, you could just use the modulo operator (%) to keep the number within the boundaries of your string.
+*/
