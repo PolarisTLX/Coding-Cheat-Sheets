@@ -68,6 +68,8 @@ function sockMerchant(n, ar) {
                             return object
                             }, {});
     
+    //NOTE  apparently the reduce function above can be  written as just a ternary:    acc[curr] ? acc[curr]++ : acc[curr] = 1;
+    
     
     // create a array that stores all the values for each kind color
     // SPECIAL NOTE  Object.values()  should have worked here to replace the 5 lines of code below, but not all browsers support it?
