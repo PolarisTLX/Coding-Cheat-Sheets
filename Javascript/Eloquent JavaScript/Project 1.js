@@ -390,3 +390,225 @@ this method below simple prints out 5 copies of the world one at a time:
 To better view this, the courses sandbox provides an animateWorld functin:
 
       animateWorld(world);
+
+
+
+CONTINUE FROM COFFEE SHOP:
+
+controlling direction of critters movement:
+
+a critter thats follows a wall: WallFlower
+define an operation (dirPlus(dir, n))   n = notch?
+each notch is 45 degrees, so for n = 4 = 4 x 45 degrees = 180 degrees
+
+where dirPlus("n", 1) means turn clockwise 1 unit (45 degrees) from "north" which will = "ne".
+where dirPlus("s", -2) means turn counter-clockwise 2 units (-90 degrees) from "south" which will = "e".
+
+In this behavior, the "act" method only has to look at the surroundings,
+starting from the left side going clockwise, for the first empty space, and move in that direction:
+
+      function dirPlus(dir, n) {
+        var index = directionNames.indexOf(dir);
+        return directionNames[(index + n + 8) % 8];
+      }
+
+      function WallFollower() {
+        this.dir = "s";
+      }
+
+      WallFollower.prototype.act = function(view) {
+        var start = this.dir;
+        // if statement to prevent critter from getting stuck in middle of empty space:
+        // does the spot at -135 (behind and left) have something there? (not empty?)
+        // if there is something there, make the direction be to -90 degrees of current direction (go left)
+        // this basically acts as though the critter just passed an object
+        if (view.look(dirPlus(this.dir, -3)) != " ") {
+          // this start is required to keep note and check further down, to prevent critter going in circles indefinitely
+          start = this.dir = dirPlus(this.dir, -2);
+        }
+        // while there is something directly ahead (not empty), turn 45 degrees right
+        while (view.look(this.dir) != " ") {
+          this.dir = dirPlus(this.dir, 1);
+          // if direction is now the same as the start (stored above), stop.
+          // critter must be walled in
+          if (this.dir == start) { break; }
+        }
+        // direction decided, now move forward
+        return {type: "move", direction: this.dir};
+      };
+
+
+ADDING CONCEPTS OF FOOD AND REPRODUCTION:
+
+Food = "energy" which decreases which each action, and increases by eating things
+when a creature has enough energy, it undergoes mytosis
+
+Also add plants as source of food that do not move keep growing.
+
+need a different version of the letAct method, to do this
+Use INHERITANCE to create LifeLikeWorld which is a prototype based off of the original World prototype
+now LifeLikeWorld will provide a new letAct method that will override the original one.
+
+
+      function LifeLikeWorld(map, legend) {
+        World.call(this, map, legend);
+      }
+      LifeLikeWorld.prototype = Object.create(World.prototype);
+
+      var actionTypes = Object.create(null);
+
+      LifeLikeWorld.prototype.letAct = function(critter, vector) {
+        var action = critter.act(new View(this, vector));
+        // first check if an action was returned at all
+        // then check if handler for this action exists
+        // then check if that handler returned true (if it successfully handled the action)
+        // the .call(this...) gives handled access to the world with the "this" binding.
+        var handled = action && action.type in actionTypes && actionTypes[action.type].call(this, critter, vector, action);
+        // if action didnt work for w/e reason, (handled = false),
+        // then default action is for critter to just sit still and lose 0.2 energy
+        if (!handled) {
+          critter.energy -= 0.2;
+          // critter dies if energy drops to 0:
+          if (critter.energy <= 0) {
+            // remove critter from the grid
+            this.grid.set(vector, null);
+          }
+        }
+      };
+
+
+
+The grow method for plants:  always succeeds and adds 0.5 energy
+
+      actionTypes.grow = function(critter) {
+         critter.energy += 0.5;
+         return true;
+       };
+
+
+  More advanced movement:
+
+       actionTypes.move = function(critter, vector, action) {
+         var dest = this.checkDestination(action, vector);
+         // first check if destionation is valid
+         // check if critter has enough energy
+         // check if destination has something there (not empty or "null")
+         if (dest == null || critter.energy <=1 || this.grid.get(dest) != null) {
+           // false = take no action
+           return false;
+         }
+         // pass criteria, so take action:
+         critter.energy -= 1;
+         // original spot where critter was now becomes empty
+         this.grid.set(vector, null);
+         // critter moves to new spot
+         this.grid.set(dest, critter);
+         return true;
+       };
+
+
+critter eating action:
+
+      actionTypes.eat = function(critter, vector, action) {
+        var dest = this.checkDestination(action, vector);
+        // check if a valid destination square?
+        // check if destination is not an empty space
+        var atDest = dest != null && this.grid.get(dest);
+        // destination has an object, now check if that object has energy (is edible):
+        if (!atDest || atDest.energy == null) {
+          return false;
+        }
+        // attacking critter gains the energy from the victim:
+        critter.energy += atDest.energy;
+        // the victim critter is removed from the map:
+        this.grid.set(dest, null);
+        return true;
+      } ;
+
+
+Reproduction through mytosis:
+
+      actionTypes.reproduce = function(critter, vector, action) {
+        // create hypothecial baby on critter's own origin character:
+        var baby = elementFromChar(this.legend, critter.originChar);
+        // check if there is a valid empty destination
+        var dest = this.checkDestination(action, vector);
+        // check if destination is valid and empty
+        // check if criter has enough energy to have baby
+        if (dest == null || critter.energy <= 2 * baby.energy || this.grid.get(dest) != null) {
+          return false;
+          // no baby happens
+        }
+        // reporduciton happens, and costs critter 2 x energy of newborn critter:
+        critter.energy -= 2 * baby.energy;
+        // baby is placed on the grid:
+        this.grid.set(dest, baby);
+        return true;
+      };
+
+
+Need new critters that have energy property:
+
+      function Plant() {
+        // plant energy level starts between 3 and 7: (this is so they don't all reproduce on the same turn)
+        this.energy = 3 + Math.random() * 4;
+      }
+      Plant. prototype.act = function(view) {
+        // when plant reaches 15 energy and there is empty space nearby, reproduce to that empy space
+        if (this.energy > 15) {
+          var space = view.find(" ");
+          if (space) {
+            return {type: "reproduce", direction: space};
+          }
+        }
+        // keep growing until it reaches max of 20 energy
+        if (this.energy < 20) {
+          return {type: "grow"};
+        }
+      };
+
+
+      function PlantEater() {
+        // starting energy level of critter:
+        this.energy = 20;
+      }
+      PlantEater.prototype.act = function(view) {
+        // look for empty space around critter
+        var space = view.find(" ");
+        // if critter has enough energy and empty space, reproduce to that empty space
+        if (this.energy > 60 && space) {
+          return {type: "reproduce", direction: space};
+        }
+        // look for plant in vicinity:
+        var plant = view.find("*");
+        // if there is one, eat it
+        if (plant) {
+          return {type: "eat", direction: plant};
+        }
+        // if there is an empty space, move towards that space
+        if (space) {
+          return {type: "move", direction: space};
+        }
+      };
+
+
+
+      // NEW WORLD WITH PLANTS AND HERBAVORES:
+
+      var valley = new LifelikeWorld(
+          ["############################",
+           "#####                 ######",
+           "##   ***                **##",
+           "#   *##**         **  O  *##",
+           "#    ***     O    ##**    *#",
+           "#       O         ##***    #",
+           "#                 ##**     #",
+           "#   O       #*             #",
+           "#*          #**       O    #",
+           "#***        ##**    O    **#",
+           "##****     ###***       *###",
+           "############################"],
+          {"#": Wall,
+           "O": PlantEater,
+           "*": Plant}
+        );
