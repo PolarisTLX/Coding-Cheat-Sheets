@@ -112,7 +112,10 @@ World.prototype.toString = function() {
 
 function Wall() {}
 
-var world = new World(plan, {"#": Wall,   "o": BouncingCritter});
+var world = new World(plan,
+  {"#": Wall,
+   "o": BouncingCritter}
+);
 
 //console.log(world.toString());
 //works up to here
@@ -327,7 +330,8 @@ actionTypes.eat = function(critter, vector, action) {
 
 //Reproduction through mytosis:
 
-actionTypes.reproduce = function(critter, vector, action) {
+// actionTypes.reproduce = function(critter, vector, action) {
+actionTypes.reproducePlant = function(critter, vector, action) {
   // create hypothecial baby on critter's own origin character:
   var baby = elementFromChar(this.legend, critter.originChar);
   // check if there is a valid empty destination
@@ -338,8 +342,9 @@ actionTypes.reproduce = function(critter, vector, action) {
     return false;
     // no baby happens
   }
-  // reporduciton happens, and costs critter 2 x energy of newborn critter:
-  critter.energy -= 2 * baby.energy;
+  // reporduciton happens, and costs critter -energy of newborn critter:
+  // critter.energy -= 2 * baby.energy;
+  critter.energy -= baby.energy;
   // baby is placed on the grid:
   this.grid.set(dest, baby);
   return true;
@@ -394,7 +399,7 @@ PlantEater.prototype.act = function(view) {
 
 // NEW WORLD WITH PLANTS AND HERBAVORES:
 
-var valley = new LifelikeWorld(
+var valley = new LifeLikeWorld(
     ["############################",
      "#####                 ######",
      "##   ***                **##",
@@ -411,3 +416,20 @@ var valley = new LifelikeWorld(
      "O": PlantEater,
      "*": Plant}
   );
+
+//to animate 5 times:
+
+/*NOTE PREVIOUS EXAMPLE:
+for (i = 0; i < 5; i++) {
+  world.turn();
+  console.log(world.toString());
+}
+*/
+
+//NOW THIS VALLEY EXAMPLE:
+for (i = 0; i < 5; i++) {
+  valley.turn();
+  console.log(valley.toString());
+}
+
+// WORKS UP TO here

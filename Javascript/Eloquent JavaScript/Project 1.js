@@ -470,6 +470,7 @@ now LifeLikeWorld will provide a new letAct method that will override the origin
           critter.energy -= 0.2;
           // critter dies if energy drops to 0:
           if (critter.energy <= 0) {
+            // console.log("Energy = " + critter.energy + ". Critter dies");
             // remove critter from the grid
             this.grid.set(vector, null);
           }
@@ -612,3 +613,78 @@ Need new critters that have energy property:
            "O": PlantEater,
            "*": Plant}
         );
+
+//to animate 5 times:
+
+    /*NOTE PREVIOUS EXAMPLE:
+
+    var plan = ["############################",
+                "#      #    #      o      ##",
+                "#                          #",
+                "#          #####           #",
+                "##         #   #    ##     #",
+                "###           ##     #     #",
+                "#           ###      #     #",
+                "#   ####                   #",
+                "#   ##       o             #",
+                "# o  #         o       ### #",
+                "#    #                     #",
+                "############################"];
+
+      var world = new World(plan,
+        {"#": Wall,
+         "o": BouncingCritter}
+      );
+
+      for (i = 0; i < 5; i++) {
+        world.turn();
+        console.log(world.toString());
+      }
+      */
+
+      //NOW THIS VALLEY EXAMPLE:
+      for (i = 0; i < 5; i++) {
+        valley.turn();
+        console.log(valley.toString());
+      }
+
+// WORKS UP TO here
+
+
+//FINAL EXERCISES
+
+/*Write a smarter critter that does not starve to death as often:
+-don't reproduce as often
+    -maybe don't reproduce if not enocuntered a plant in several turns?
+-starve if no plants nearby
+   - maybe not move in less random direction?
+   - maybe move less if starving?
+-eat all the plant life till all gone
+   - maybe only eat a bit at a time to let plants grow?
+*/
+
+
+function SmartPlantEater() {
+  // starting energy level of critter:
+  this.energy = 20;
+}
+PlantEater.prototype.act = function(view) {
+  // look for empty space around critter
+  var space = view.find(" ");
+  // if critter has enough energy and empty space, reproduce to that empty space
+  if (this.energy > 60 && space) {
+    return {type: "reproduce", direction: space};
+  }
+  // look for plant in vicinity:
+  var numMoves = 0;
+  var plant = view.find("*");
+  // if there is one, and has moved more than 4, eat it
+  if (plant && numMoves > 4) {
+    return {type: "eat", direction: plant};
+  }
+  // if there is an empty space, move towards that space
+  if (space) {
+    return {type: "move", direction: space};
+    numMoves++;
+  }
+};
