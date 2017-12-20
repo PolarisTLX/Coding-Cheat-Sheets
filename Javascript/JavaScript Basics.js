@@ -735,3 +735,32 @@ So you could express the previous example in a slightly simpler way:
 
 This works only for higher-order functions that support such a context parameter.
 When they don’t, you’ll need to use one of the other approaches.
+
+
+
+STRICT MODE:
+By putting "use strict";  at the top of a file or top of a functin,
+JavaScript is a bit less assumptive of trying to guess what you might mean when you made a mistake
+
+EXAMPLE: WHY HAVE THE "VAR =" IN A FOR LOOP:
+
+function canYouSpotTheProblem() {
+  "use strict";
+  for ( i = 0 ; i < 10 ; i++ ) {
+    console.log("Happy Function");
+  }
+}
+
+canYouSpotTheProblem();
+// ReferenceError: i is not defined
+// ("var =" is missing)
+// this error will not occur if "use strict" is not present
+
+Normally when you dont put "var i = ", JS quietly solves this by creating a global variable for "i" and uses that.
+
+So when you then type "window.i"  you will get a value of 10,
+because i is now a global variable.
+If you use "var i = ",  i will not be a global variable
+and typing "window.i" will give "undefined".
+
+This will cause problems if there is already exists a global variable of the same name.
