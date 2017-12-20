@@ -764,3 +764,7 @@ If you use "var i = ",  i will not be a global variable
 and typing "window.i" will give "undefined".
 
 This will cause problems if there is already exists a global variable of the same name.
+
+
+
+Another change in strict mode is that the this binding holds the value undefined in functions that are not called as methods.
