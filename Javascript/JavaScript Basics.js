@@ -766,5 +766,65 @@ and typing "window.i" will give "undefined".
 This will cause problems if there is already exists a global variable of the same name.
 
 
+STRICT MODE:
+EXAMPLE: "this" keyword in a constructor
 
 Another change in strict mode is that the this binding holds the value undefined in functions that are not called as methods.
+
+For example, consider the following code, which calls a constructor without the new keyword so that its this will not refer to a newly constructed object:
+
+function Person(name) { this.name = name; }
+var ferdinand = Person("Ferdinand");   //forgot to put "new" Person()
+
+console.log(name);
+// Ferdinand
+window.name
+// "Ferdinand"
+
+without strict mode, above the "this" will refer to a global object.
+
+"use strict";
+function Person(name) { this.name = name; }
+var ferdinand = Person("Ferdinand");  //forgot to put "new" Person()
+// ERROR!!!  TypeError: Cannot set property 'name' of undefined.
+
+var ferdinand = new Person("Ferdinand");
+console.log(name);
+// Ferdinand
+window.name
+// ""
+
+
+TESTING:
+write a second program to test if our code works as intended when changes are made.
+
+function Vector(x, y) {
+  this.x = x;
+  this.y = y;
+}
+Vector.prototype.plus = function(other) {
+  return new Vector(this.x + other.x, this.y + other.y);
+};
+
+
+second testing program:
+
+function testVector() {
+  var p1 = new Vector(10, 20);
+  var p2 = new Vector(-10, 5);
+  var p3 = p1.plus(p2);
+
+  if (p1.x !== 10) { return "fail: x property"; }
+  if (p1.y !== 20) { return "fail: y property"; }
+  if (p2.x !== -10) { return "fail: negative x property"; }
+  if (p3.x !== 0) { return "fail: x from plus"; }
+  if (p3.x !== 25) { return "fail: y from plus"; }
+
+  //else
+  return "everything still ok!";
+}
+
+console.log(textVector());
+// everything still ok!
+
+Can also use "testing frameworks" which is software to reduce  writting repetitive, awkward code.
