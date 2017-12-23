@@ -856,3 +856,46 @@ function promptNumber(question) {
   } else { return result; }
 }
 console.log(promptNumber("How many tree do you see?"));
+
+
+EXCEPTIONS:
+
+Mechanisms that make it possible for code that runs into a problem to raise (or throw) and exception, which is simply a value.
+Raising an exception somehat resembles a super-charged return from a functin: it jumps out of not just the current functin,
+but also out of its callers, all the way down to the first call that started the current execution.
+This is called UNWINDING THE STACK.
+
+BUT if exceptions always zoomed right down to the bottom of the stack, thery would not be much use.
+This would just blow up the program.  So you set "obstacles" along the stack to "catch" the exception
+as it is zooming down. This is what makes them powerful/useful, because then you can do something with it,
+after which the program continues running.
+
+Example:
+
+function promptDirection(question) {
+  var result = prompt(question, "");
+  if (result.toLowerCase() == "left") { return "L";}
+  if (result.toLowerCase() == "right") { return "R";}
+  // if neither of the above occurs:
+  throw new Error(result + " Is an invalid direction.");
+}
+
+function look() {
+  if (promptDirection("Which way?") == "L") {
+    return "a house";
+  } else {
+    return "two hungry bears";
+  }
+}
+
+try {
+  console.log("You see", look());
+} catch (error) {
+  console.log("Something went wrong: " + error);
+}
+
+The "throw" keyword is what raises the exception.
+Then catching it is done with the "try" keyword,
+you wrap a piece of code in a "try block"
+followed by the word "catch".
+
