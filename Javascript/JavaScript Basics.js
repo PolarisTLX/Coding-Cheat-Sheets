@@ -962,4 +962,3 @@ now we can do:
 
     console.log(context);
     // ->  null   (which was the original value before the function withContext was called and interacted with it)
-
