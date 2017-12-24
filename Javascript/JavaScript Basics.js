@@ -855,9 +855,11 @@ function promptNumber(question) {
     return "That is not a valid number";
   } else { return result; }
 }
-console.log(promptNumber("How many tree do you see?"));
+console.log(promptNumber("How many trees do you see?"));
 
 
+
+// section from Mark's place
 EXCEPTIONS:
 
 Mechanisms that make it possible for code that runs into a problem to raise (or throw) and exception, which is simply a value.
@@ -872,34 +874,32 @@ after which the program continues running.
 
 Example:
 
-function promptDirection(question) {
-  var result = prompt(question, "");
-  if (result.toLowerCase() == "left") { return "L";}
-  if (result.toLowerCase() == "right") { return "R";}
-  // if neither of the above occurs:
-  throw new Error(result + " Is an invalid direction.");
-}
+    function promptDirection(question) {
+      var result = prompt(question, "");
+      if (result.toLowerCase() == "left") { return "L";}
+      if (result.toLowerCase() == "right") { return "R";}
+      // if neither of the above occurs:
+      throw new Error(result + " Is an invalid direction.");
+    }
 
-function look() {
-  if (promptDirection("Which way?") == "L") {
-    return "a house";
-  } else {
-    return "two hungry bears";
-  }
-}
+    function look() {
+      if (promptDirection("Which way?") == "L") {
+        return "a house";
+      } else {
+        return "two hungry bears";
+      }
+    }
 
-try {
-  console.log("You see", look());
-} catch (error) {
-  console.log("Something went wrong: " + error);
-}
+    try {
+      console.log("You see", look());
+    } catch (error) {
+      console.log("Something went wrong: " + error);
+    }
 
 The "throw" keyword is what raises the exception.
 Then catching it is done with the "try" keyword,
 you wrap a piece of code in a "try block"
 followed by the word "catch".
-
-<<<<<<< HEAD
 
 
 
@@ -962,5 +962,4 @@ now we can do:
 
     console.log(context);
     // ->  null   (which was the original value before the function withContext was called and interacted with it)
-=======
->>>>>>> origin/master
+
