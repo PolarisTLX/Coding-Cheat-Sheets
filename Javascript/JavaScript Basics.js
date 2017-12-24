@@ -855,4 +855,111 @@ function promptNumber(question) {
     return "That is not a valid number";
   } else { return result; }
 }
-console.log(promptNumber("How many tree do you see?"));
+console.log(promptNumber("How many trees do you see?"));
+
+
+
+// section from Mark's place
+EXCEPTIONS:
+
+Mechanisms that make it possible for code that runs into a problem to raise (or throw) and exception, which is simply a value.
+Raising an exception somehat resembles a super-charged return from a functin: it jumps out of not just the current functin,
+but also out of its callers, all the way down to the first call that started the current execution.
+This is called UNWINDING THE STACK.
+
+BUT if exceptions always zoomed right down to the bottom of the stack, thery would not be much use.
+This would just blow up the program.  So you set "obstacles" along the stack to "catch" the exception
+as it is zooming down. This is what makes them powerful/useful, because then you can do something with it,
+after which the program continues running.
+
+Example:
+
+    function promptDirection(question) {
+      var result = prompt(question, "");
+      if (result.toLowerCase() == "left") { return "L";}
+      if (result.toLowerCase() == "right") { return "R";}
+      // if neither of the above occurs:
+      throw new Error(result + " Is an invalid direction.");
+    }
+
+    function look() {
+      if (promptDirection("Which way?") == "L") {
+        return "a house";
+      } else {
+        return "two hungry bears";
+      }
+    }
+
+    try {
+      console.log("You see", look());
+    } catch (error) {
+      console.log("Something went wrong: " + error);
+    }
+
+The "throw" keyword is what raises the exception.
+Then catching it is done with the "try" keyword,
+you wrap a piece of code in a "try block"
+followed by the word "catch".
+
+
+
+
+CLEANING UP AFTER EXCEPTIONS:
+
+this program makes sure that an initial variable "context"
+maintains its original value after the functin is done interacting with it.
+
+    var context = null;
+
+    function withContext(newContext, body) {
+      var oldContect = context;
+      context = newContext;
+      var results = body();
+      context = oldContext;
+      return result;
+    }
+
+problem: if body raises an exception, the whole functin withContext will be thrown out of the stack,
+and "context" will not regain back its original value.
+
+solution: "try" statements also have a "finally" keyword
+that can be used with or instead of the "catch" keyword
+
+"finally" basically is "No matter what, run this code after trying to run the code in the "try" block"
+even if there is an error/exception, the code in "finally" will run, thus:
+
+    function withContext(newContext, body) {
+      var oldContect = context;
+      context = newContext;
+      try {
+        return body();
+      } finally {
+        context = oldContext;
+      }
+    }
+
+and context will be reset no matter what.
+NOTE that we no longer need to store
+    var results = body();
+we can just:
+    return body();
+"FINALLY" WILL RUN EVEN AFTER A "RETURN" STATEMENT!
+
+now we can do:
+
+    try {
+      withContext(5, function() {
+        if (context < 10) {
+          throw new Error("Not enough context.");
+        }
+      });
+    } catch (e) {
+      // e = the Error was that thrown above
+      console.log("Ignoring: " + e);
+    }
+    // -> Ignoring: Error: Not enough context.
+    error was thrown
+
+
+    console.log(context);
+    // ->  null   (which was the original value before the function withContext was called and interacted with it)
