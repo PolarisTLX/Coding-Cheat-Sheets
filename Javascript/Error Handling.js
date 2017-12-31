@@ -358,7 +358,7 @@ function lastElement(array) {
   return array[array.length - 1];
 }
 
-In this case, the last function "lastElement" we are testing if an array has at least 1 element.
+In this case, the last functin "lastElement" we are testing if an array has at least 1 element.
 if the array.length is NOT > 0, (its empty),
 then the test will be false, and assert will throw the error
 that we called "AssertionFailed", that we defined above it,
@@ -370,3 +370,30 @@ lastElement simply returns the last element of the array.
 If we did not use this assertion, and we used an empty array,
 lastElement would simply return "undefined". Which is a nonsense value
 that can carry forward through our program.
+
+
+END OF CHAPTER EXERCISES:
+
+RETRY:
+A functin called "primitiveMultiply", 50% of the time properly multiplies two numbers,
+and then 50% of the time raises an exception called "MultiplicatorUnitFailure".
+
+Write a functin that wraps this clunky "primitiveMultiply" and just keeps trying until you get the proper result every time.
+Make sure to only handle the exceptions you are trying to handle.
+
+
+function MultiplicatorUnitFailure() {}
+
+function primitiveMultiply(a, b) {
+  if (Math.random() < 0.5) {
+    return a* b;
+  } else {
+    throw new MultiplicatorUnitFailure();
+  }
+}
+
+function reliableMultiply(a, b) {
+  // your code here
+}
+
+console.log(reliableMultiply(8, 8));  // 64
