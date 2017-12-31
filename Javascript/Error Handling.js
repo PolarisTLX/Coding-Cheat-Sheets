@@ -279,19 +279,94 @@ As a general rule, dont blanket-catch exceptions unless its to purposely "routin
 Ex: over the network to tell another system that our program crashed.
 
 
-SOLUTION: SELECTIVE CATCHING OF SPEFIFIC EXCEPTIONS:
+SOLUTION: SELECTIVE CATCHING OF SPECIFIC EXCEPTIONS:
 JavaScript has a flaw in that it doesnt provide direct support for selective catching of exceptions.
 
 But we can achieve this by checking in the   catch (e){}  block
 whether the exception we caught is the one we are interested in and by rethrowing it otherwise.
 
 How to recognize an exception:
-define a new type of error and use "instanceof" to identify it:
+define a new type of error and use "instanceof" to identify it.
+So below we create a kind of error we call InputError,
+which is a prototype derived from Error.prototype.
+and give its prototype a prototype.name
 
 function InputError(message) {
   this.message = message;
-  this.stack = (new Error())
+  this.stack = (new Error()).stack;
 }
-.
-.
-.
+InputError.prototype = Object.create(Error.prototype);
+InputError.prototype.name = "InputError";
+
+
+So instanceof Error will return true for InputError objects.
+Its also given a name property, since the standard error types:
+(Error, SyntaxError, ReferenceError), also have a name property.
+
+Now promptDirection can throw such an error:
+
+function promptDirection(question) {
+  var result = prompt(question, "");
+  if (result.toLowerCase() == "left") { return "L";}
+  if (result.toLowerCase() == "right") { return "R";}
+  // if nothing above stops the function (ie not a recognized input):
+  throw new InputError("Invalid direction: " + result);
+}
+
+now the loop can catch it more carefully:
+
+for (;;) {
+  try {
+    var direction = promptDirection("Where?");
+    console.log("You chose ", direction);
+    break;
+  } catch (e) {
+    if ( e instanceof InputError ) {
+      console.log("Not a valid direction. Try again.");
+    } else {
+      throw e;
+    }
+  }
+}
+
+now it will catch ONLY instances of "InputError", but will let unrelated exceptions through.
+If you introduce a type, like prompDirection (missing a "t"),
+the undefined variable error will be properly reported.
+
+
+
+ASSERTIONS:
+These are a tool to do sanity checks for code errors.
+They are a way of making sure that a mistake will cause failure right where/when
+the mistake happens, instead of potentially have the code silently producing a nonsense value that carries through the code.
+
+Example: we create a help function called "assert"
+
+function AssertionFailed(message) {
+  this.message = message;
+}
+AssertionFailed.protype = Object.create(Error.prototype);
+
+function assert(test, message) {
+  if (!test) {
+    throw new AssertionFailed(message);
+  }
+}
+
+function lastElement(array) {
+  assert(array.length > 0, "empty array in lastElement");
+  return array[array.length - 1];
+}
+
+In this case, the last function "lastElement" we are testing if an array has at least 1 element.
+if the array.length is NOT > 0, (its empty),
+then the test will be false, and assert will throw the error
+that we called "AssertionFailed", that we defined above it,
+and the message will be "empty array in lastElement".
+
+If the array is not empty, test is true, and assert does nothing,
+lastElement simply returns the last element of the array.
+
+If we did not use this assertion, and we used an empty array,
+lastElement would simply return "undefined". Which is a nonsense value
+that can carry forward through our program.
