@@ -386,14 +386,89 @@ function MultiplicatorUnitFailure() {}
 
 function primitiveMultiply(a, b) {
   if (Math.random() < 0.5) {
-    return a* b;
+    return a * b;
   } else {
+    //console.log("failure");
     throw new MultiplicatorUnitFailure();
   }
 }
 
+
 function reliableMultiply(a, b) {
-  // your code here
+  try {
+    // I WAS MISSING THE RETURN HERE! (it's kept just giving "undefined")
+    return primitiveMultiply(a, b);
+  } catch (e) {
+    if (e instanceof MultiplicatorUnitFailure) {
+      // recursion, just try it again. Won't likely crash at 50/50 chance.
+      reliableMultiply(a, b);
+    } else {
+      throw e;
+    }
+  }
 }
 
 console.log(reliableMultiply(8, 8));  // 64
+
+
+
+THE LOCKED BOX:
+
+var box = {
+  locked: true,
+  unlock: function() { this.locked = false; },
+  lock: function() { this.locked = true; },
+  _content: [],
+  get content() {
+    if (this.locked) throw new Error("Locked!");
+    return this._content;
+  }
+};
+
+// I don't think the _ is needed here or looks good for the content variable name
+
+
+It is a box with a lock. Inside is an array,
+but you can only get at it when the box is unlocked.
+Directly accessing the _content property is not allowed.
+
+Write a function called withBoxUnlocked that takes a function value as argument,
+unlocks the box, runs the function, and then ensures that the box is locked again
+before returning, regardless of whether the argument function returned normally
+or threw an exception.
+
+
+function withBoxUnlocked(body) {
+  var initialState = box.locked;
+  // box.unlock;
+  box.unlock();
+  try {
+    // return body;
+    return body();
+  }
+  finally {
+    // if the box started off as locked, relock it at the end
+    if (initialState) {
+      // box.lock;
+      box.lock();
+    }
+  }
+}
+
+
+withBoxUnlocked(function() {
+  box.content.push("gold piece");
+});
+
+try {
+  withBoxUnlocked(function() {
+    throw new Error("Pirates on the horizon! Abort!");
+  });
+} catch(e) {
+  console.log("Error raised:", e);
+}
+
+console.log(box.locked);  // true
+
+
+For extra points, make sure that if the box started off already unlocked, that it remains unlocked at the end.
