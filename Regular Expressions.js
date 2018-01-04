@@ -134,3 +134,70 @@ console.log(neighbor.test("neighbor"));  //true
 console.log(neighbor.test("neighbour")); //true
 console.log(neighbor.test("neighboor")); //false
 console.log(neighbor.test("nieghbor"));  //false
+
+
+
+GROUPING SUBEXPRESSIONS: (...+):
+To use an + or a * or other operators on more than one element at a time,
+put them in () parentheses.
+Parts of a RegExp that is enclosed in () count as a single operation:
+
+var crying = /boo+(hoo+)+/;
+console.log(crying.test("boohoooohoohooo"));  //true
+console.log(crying.test("Boohoooohoohooo"));  //false
+console.log(crying.test("boohoooohoohooo"));  //true
+console.log(crying.test("booohoooohoohooo"));  //true
+console.log(crying.test("boohohohooo"));  //false
+console.log(crying.test("bohoohoohooo"));  //false
+
+The first and second + above apply to only the second "o" in "boo" and "hoo".
+The third + applies to the group (hoo+), matching one or more sequences of "hoo".
+
+CASE SENSITIVITY: "i":
+
+var crying = /boo+(hoo+)/i;   // i means "NOT case sentive" or "case "in"sensitive"
+console.log(crying.test("boohoooohoohooo"));  // true
+console.log(crying.test("Boohoooohoohooo"));  // true
+
+
+
+EXEC: (EXECUTE) INSTEAD OF TEST:
+RegExp also have .exec that will return "null" if no match was found,
+but will return an object(an array of strings) with info if there is a match:
+
+var match = /\d+/.exec("one two 100");
+// d+ for "digits, one or more"
+console.log(match);  // ["100", index: 8, input: "one two 100"]
+This shows its an array of strings
+
+Objects returned from .exec has an "index" property to indicate where it was matched in the provided string.
+console.log(match.index); // 8
+The digits first occured in the given string at index 8.
+
+Strings also have a similar method ".match" that does the EXACT same thing:
+console.log("one two 100".match(/\d+/));
+// ["100", index: 8, input: "one two 100"]
+(the format is just reversed)
+
+var quotedText = /'([^']*)'/;
+console.log(quotedText.exec("she said 'hello'"));
+// ["'hello'", "hello", index: 9, input: "she said 'hello'"]
+
+
+when a group does not end up being matched at all, example when followed by a "?",
+its index will be "undefined":
+
+console.log(/bad(ly)?/.exec("bad"));
+// ["bad", undefined, index: 0, input: "bad"]
+
+
+// DON'T GET THIS ONE
+when a group is matched many times, only the index of the last one is shown:
+console.log(/(\d)+/.exec("123"));
+// ["123", "3", index: 0, input: "123"]
+
+
+Groups can be useful for extracting parts of a string.  For when we want to not just confirm it exists,
+but also grab it and do something with it.
+This is done by wrapping () parentheses around the pattern.
+Such as for taking out a date out of a string.
