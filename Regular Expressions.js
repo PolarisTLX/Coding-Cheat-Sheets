@@ -201,3 +201,389 @@ Groups can be useful for extracting parts of a string.  For when we want to not 
 but also grab it and do something with it.
 This is done by wrapping () parentheses around the pattern.
 Such as for taking out a date out of a string.
+
+
+
+(A detour in the chapter?)
+THE DATE TYPE
+JavaScript has a specific object type for storing dates, called Date().
+
+If you create a new object of Date(), it gives the current time and date:
+console.log(new Date());
+// Wed Jan 03 2018 23:48:26 GMT-0500 (Eastern Standard Time)
+
+Can also create an object for a specific date and time:
+console.log(new Date(YYYY, MM, D, HH, MM, SS, MSS));
+console.log(new Date(2009, 11, 9));
+// Wed Dec 09 2009 00:00:00 GMT-0500 (Eastern Standard Time)
+console.log(new Date(2009, 11, 9, 12, 59, 59, 999));
+// Wed Dec 09 2009 12:59:59 GMT-0500 (Eastern Standard Time)
+
+// NOTE  JavaScript STUPIDLY decided that MONTHS would start at 0
+// but days start 1 !!!!   It's just stupid.
+
+
+UNIX TIMESTAMPS:
+UNIX Timestamps are measured as number of miliseconds since 1970.
+Anything before this uses negative numbers.
+The method .getTime() returns this number.  It is a big number due to miliseconds.
+console.log(new Date(2018, 1, 3).getTime());
+// 1517634000000
+console.log(new Date(1378297460000));
+// Wed Sep 04 2013 08:24:20 GMT-0400 (Eastern Daylight Time)
+
+// Date.now() will return the current time in this UNIX milisecond format
+console.log(Date.now());
+// 1515042081328
+
+There is also getFullYear, getMonth, getHours, getMinutes, getSeconds, getDate
+// NOTE "getYear" is useless, always use "getFullYear".
+console.log(new Date(2018, 1, 3).getMonth());  // 1
+console.log(new Date(2018, 1, 3).getDate());  // 3
+console.log(new Date(2018, 1, 3).getFullYear());  // 2018
+console.log(new Date(2018, 1, 3).getYear());  // 118 ??? USELESS
+console.log(new Date(2018, 1, 3).getHours());  // 0 (none provided)
+console.log(new Date(2018, 1, 3).getMinutes());  // 0 (none provided)
+console.log(new Date(2018, 1, 3).getSeconds());  // 0 (none provided)
+
+
+
+GET CURRENT TIME (DATE, HOURS, MINUTES etc):
+console.log(new Date().getMinutes());  // 17  (currently 12:17 am)
+
+
+FINDING A DATE IN A STRING / IN ANY TEXT:
+Using all this to create a date object from a string:
+function findDate(string) {
+  //var datePattern = /(\d{1,2})-(\d{1,2})-(\d{4})/;
+  // SEE BELOW WHY the $ is needed.
+  var datePattern = /^(\d{1,2})-(\d{1,2})-(\d{4})$/;
+  var matchArray = datePattern.exec(string);
+  console.log(matchArray);
+  return new Date(Number(matchArray[3]),
+                  Number(matchArray[2]) - 1,
+                  // minus 1 because only months start at 0, lol (see note about stupidity above)
+                  Number(matchArray[1]));
+}
+console.log(findDate("30-1-2003"));
+// ["30-1-2003", "30", "1", "2003", index: 0, input: "30-1-2003"]
+// Thu Jan 30 2003 00:00:00 GMT-0500 (Eastern Standard Time)
+
+matchArray[3] is "2003",  putting Number in front makes it not a string
+matchArray[2] -1 is 1 -1, = 0  which represents January (only for months)
+matchArray[1] is "30",
+
+so we are returning new Date(2003, 0, 30);
+
+
+console.log(findDate("I wish to buy a house by 30-1-2003"));
+// ["30-1-2003", "30", "1", "2003", index: 25, input: "I wish to buy a house by 30-1-2003"]
+// Thu Jan 30 2003 00:00:00 GMT-0500 (Eastern Standard Time)
+
+
+NOTE!!!  PROBLEM:
+console.log(findDate("30-1-220033"));  wouldnt work but still returns a date,
+ALSO
+console.log(findDate("14530-1-2003"));  wouldnt work but still returns a date,
+
+Unfortunately, findDate will also happily extract the nonsensical date 00-1-3000 from the string "100-1-30000".
+A match may happen anywhere in the string, so in this case,
+it’ll just start at the second character and end at the second-to-last character.
+
+If we want to enforce that the match must span the whole string,
+we can add the markers ^ and $.
+
+This pattern fixes it:
+var datePattern = /^(\d{1,2})-(\d{1,2})-(\d{4})$/;
+
+BEGINS AND ENDS WITH:   ^  AND  $  :
+
+The ^ matches the start of the string,
+The $ matches the end of the string.
+
+So  /^\d+$/  matches a string  that is exactly one or more digits,
+Then /^!/  matches any string that starts with an ! mark (there can be nothing before it.)
+Then /!$/  matches any string that ends with an ! mark (there can be nothing after it.)
+
+console.log(/!$/.exec("Help!"));      // ["!", index: 4, input: "Help!"]
+console.log(/!$/.exec("Help"));       // null  (does not end in !)
+console.log(/!$/.exec("Help!Help"));  // null  (does not end in !)
+console.log(/!$/.exec("HelpHelp!"));  // ["!", index: 8, input: "HelpHelp!"]
+
+console.log(/^!/.exec("Help!"));      // null  (does not begin with !)
+console.log(/^!/.exec("!Help"));      // ["!", index: 0, input: "!Help"]
+console.log(/^!/.exec("!Help!"));     // ["!", index: 0, input: "!Help!"]
+
+console.log(/^!.*!$/.exec("!Help"));     // null  (does not begin AND end with !)
+Needs ".*", which means any characters in between repeated 0 or more times
+console.log(/^!.*!$/.exec("!Help!"));     // ["!Help!", index: 0, input: "!Help!"]
+console.log(/^!.*!$/.exec("!!"));     // ["!!", index: 0, input: "!!"]
+
+
+
+
+
+WORD BOUNDARY: \b
+Start or end of a string or any point in a string that has a word character on one side,
+and a non-word character on the other side.
+
+console.log(/cat/.test("concatenate"));          // true
+console.log(/\bcat\b/.test("concatenate"));      // false
+console.log(/\bcat\b/.test("con--cat--enate"));  // true
+console.log(/\bcat/.test("con--cat--enate"));    // true
+console.log(/cat\b/.test("con--cat--enate"));    // true
+console.log(/\bcat\b/.test("concat--enate"));    // false
+
+
+
+FIND a NUMBER followed by ONE OF A FEW WORDS, or their PLURAL FORMS:
+Ex: number + either pig(s), cow(s) or chicken(s).
+
+Instead of writting 3 regular expressions:
+
+var animal = /\b\d+ (pig|cow|chicken)s?\b/;
+console.log(animal.test("15 pigs"));         // true
+console.log(animal.test("15 manbearpigs"));  // false
+
+
+
+BACKTRACKING in REGEXP:
+
+console.log(/.*x/.test("abcx7"));  // true
+
+The RegExp will test the while string ".*" and see if it ends with an "x".
+When it doesnt, abcx7 does not have an x after,
+so it goes back and tries again with 1 character less,
+abcx also does not have an x after it, so it tries again,
+abc DOES have an x after it, so it succeeds.
+
+
+
+
+REPLACING WITH .replace  and RegExp:
+
+strings already have a .replace method:
+
+var start = "papa"
+
+var middle = "papa".replace("p", "m");
+console.log(middle);
+// mapa
+var end = middle.replace("p", "m")
+console.log(end);
+// mama
+
+However, this only does one letter at a time.
+Using RegExp as the first argument improves this:
+
+console.log("papa".replace(/p/, "m"));   // mapa     same result
+
+But now using "g" for global:
+console.log("papa".replace(/p/g, "m"));   // mama    all "p"s are replaced
+
+
+REPLACE ALL "2"s OR "4"s  TO BECOME "3"s:
+console.log("363642362244".replace(/[24]/g, "3"));   // 363633363333
+
+
+
+RE-ARRANGE "LastName, FirstName" TO  "FirstName LastName" WITH $1 & $2:
+
+var listOfNames = "Rail, Paul\nRail, Melanie\nRail, Celine\nRobertson, James";
+//console.log(listOfNames);
+
+var rearranged = listOfNames.replace(/([\w]+), ([\w]+)/g, "$2 $1");
+
+([\w]+), ([\w]+) means:
+(word characters of any length in a row) + ", " + (word characters of any length in a row)
+
+console.log(rearranged);
+
+    Paul Rail
+    Melanie Rail
+    Celine Rail
+    James Robertson
+
+
+PASSING A FUNCTION IN .replace  AS THE SECOND ARGUMENT:
+
+var phrase = "the cia and fbi";
+
+var corrected = phrase.replace(/\b(fbi|cia)\b/g, function(string) {
+  return string.toUpperCase();
+});
+
+console.log(corrected);   // the CIA and FBI
+
+
+IF THERE IS ONLY 1 OF AN ITEM LEFT, REMOVE THE "s":
+
+    var stock = "1 lemon, 2 cabbages, and 101 eggs";
+    // pattern is number of any digits length, then a space, then word of any characters length
+    var pattern = /(\d+) (\w+)/g;
+
+NOTE:  Each () in the pattern above is provided as an argument to the functin,
+and the order of the ()s is important in this case.
+
+    function minusOne(match, amount, unit) {
+      console.log(arguments);
+
+      //reduce number by 1:  (needs to be converted from string first)
+      amount = Number(amount) - 1;
+      // if only 1 left, remove the "s":
+      if (amount == 1) {
+        unit = unit.slice(0, unit.length -1);
+      }
+      else if (amount == 0) {
+        amount = "no";
+      }
+      return amount + " " + unit;
+    }
+
+    console.log(stock.replace(pattern, minusOne));
+    // no lemon, 1 cabbage, and 100 eggs
+
+NOT SURE HOW the function recognizes the number as "amount" and the name as "unit"
+"match" is an object containing info of all matches.
+
+
+function lloan(test1, test2){
+    //console.log(arguments);
+    console.log(test2.toUpperCase());
+}
+
+lloan(test2 = 'hello', test1 = 'test');  //TEST
+console.log(lloan('hello', 'test')); //TEST
+
+Seems that saying "test2 = 'hello'" does nothing. It only matters what order they were provided
+
+
+
+Toying with it to better understand:
+
+    var stock = "1 lemon zest, 2 cabbages rolls, and 101 eggs whites";
+    // pattern is number of any digits length, then a space, then word of any characters length
+    var pattern = /(\d+) (\w+) (\w+)/g;
+
+    function minusOne(match, amount, unit, type) {
+      console.log(match);  // 1 lemon zest (first round only)
+      console.log(amount); // 1
+      console.log(unit);   // lemon
+      console.log(type);   // zest
+
+      //reduce number by 1:  (needs to be converted from string first)
+      amount = Number(amount) - 1;
+      // if only 1 left, remove the "s":
+      if (amount == 1) {
+        unit = unit.slice(0, unit.length -1);
+      }
+      else if (amount == 0) {
+        amount = "no";
+      }
+      return amount + " " + unit + " " + type;
+    }
+
+    console.log(stock.replace(pattern, minusOne));
+
+          1 lemon zest
+          1
+          lemon
+          zest
+          2 cabbages rolls
+          2
+          cabbages
+          rolls
+          101 eggs whites
+          101
+          eggs
+          whites
+
+          no lemon zest, 1 cabbage rolls, and 100 eggs whites
+
+
+  stock.replace(pattern, minusOne) =:
+    stock = string being tested
+    pattern = what we are looking for in the string
+    minusOne = what that will be replaced with
+
+  for minusOne, which is a function:
+      functin minusOne(match, amount, unit, type)
+  (because there is a "g") this will be EACH pattern matched in the string you get:
+    -First argument (what was matched)
+    -+another argument for each "()" in that pattern, in order of appearence
+      var pattern = /(\d+) (\w+) (\w+)/g;
+      since pattern has (\d+) (\w+) (\w+), that is 3 more arguments:
+
+      functin minusOne(part of string that matches the pattern, (1), (2), (3))
+
+
+
+REMOVE ALL COMMENTS FROM JS CODE:
+
+function stripComments(code) {
+  //return code.replace(/\/\/.*|\/\*[^]*\*\//g, "");
+  // (fixed example here, explained below)
+  return code.replace(/\/\/.*|\/\*[^]*?\*\//g, "");
+}
+
+comment1 = "x = 10;// ten!";
+comment2 = "1 + /* 2 */3";
+comment3 = "1 /* a */+/* b */ 1";
+
+console.log(stripComments(comment1));  // x = 10
+console.log(stripComments(comment2));  // 1 + 3
+console.log(stripComments(comment3));  // 1  1   <-- PROBLEM
+
+
+The [^]* part the expression does some RegExp backtracking, will first match as much as it can.
+If that causes the next part of the pattern to fail, it moves back one character and tries again from there.
+
+
+The repetition operators (+, *, ?, {}) are "greedy":
+Because they match as much as they can and backtrack from there.
+If you put a "?" after them (+?, *?, ??, {}?), they become non-greedy,
+because they start by matching as little as possible,
+matching more only when the remaining pattern does not fil the smaller match.
+
+// so now the same function with an extra "?" in the RegExp:
+function stripComments(code) {
+  return code.replace(/\/\/.*|\/\*[^]*?\*\//g, "");
+}
+
+comment3 = "1 /* a */+/* b */ 1";
+console.log(stripComments(comment3));
+// 1 + 1  (proper)
+// (instead of   " 1  1 " like above)
+
+
+These "Greedy" operators can cause a lot of bugs in RegExp.
+
+
+
+WHEN YOU DONT KNOW THE PATTERN AHEAD OF TIME:
+DYNAMICALLY CREATING REGEXP OBJECTS:
+
+Example: look for a users name in a piece of text,
+but you wont know the name until the program is running.
+Cannot use the slash-based notation for this.
+
+var name = "harry"
+var text = "Harry is a suspicious character.";
+var regexp = new RegExp("\\b(" + name + ")\\b", "gi");
+// gi is fro global and case insensitive
+
+console.log(text.replace(regexp, "_$1_"));
+_Harry_ is a suspicious character.
+
+
+weird name example:  name = "dea+hl[]rd"
+
+to fix this, we use add backslashes before any character that we dont trust:
+use it for anything that is not alphanumeric or whitespace.
+
+var name = "dea+hl[]rd";
+var text = "This dea+hl[]rd kid is super annoying.";
+var escaped = name.replace(/[^\w\s]/g, "\\$&");
+
+
+typing nonsense for now
