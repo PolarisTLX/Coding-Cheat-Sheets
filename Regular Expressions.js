@@ -567,13 +567,13 @@ Example: look for a users name in a piece of text,
 but you wont know the name until the program is running.
 Cannot use the slash-based notation for this.
 
-var name = "harry"
-var text = "Harry is a suspicious character.";
-var regexp = new RegExp("\\b(" + name + ")\\b", "gi");
-// gi is fro global and case insensitive
+    var name = "harry"
+    var text = "Harry is a suspicious character.";
+    var regexp = new RegExp("\\b(" + name + ")\\b", "gi");
+    // gi is fro global and case insensitive
 
-console.log(text.replace(regexp, "_$1_"));
-_Harry_ is a suspicious character.
+    console.log(text.replace(regexp, "_$1_"));
+    // _Harry_ is a suspicious character.
 
 
 weird name example:  name = "dea+hl[]rd"
@@ -581,9 +581,31 @@ weird name example:  name = "dea+hl[]rd"
 to fix this, we use add backslashes before any character that we dont trust:
 use it for anything that is not alphanumeric or whitespace.
 
-var name = "dea+hl[]rd";
-var text = "This dea+hl[]rd kid is super annoying.";
-var escaped = name.replace(/[^\w\s]/g, "\\$&");
+    var name = "dea+hl[]rd";
+    var text = "This dea+hl[]rd kid is super annoying.";
+    // before moving on we will modify "name",
+    // escaped firstr goes through "name" and for any non word character we add \\
+    var escaped = name.replace(/[^\w\s]/g, "\\$&");
 
 
-typing nonsense for now
+STILL NEED TO UNDERSTAND THE LINE ABOVE!
+
+recall that:
+\d  =  same as [0-9], any digit characters
+\D  =  any character that is NOT a digit
+\w  =  any letter character,  same as [a-zA-Z] ?
+\W  =  any NON-LETTER character
+\s  =  any white space character (space, tab, newline)
+\S  =  any NON-WHITE SPACE characters
+.   =  any character except for newline (\n?)
+
+so a backslash \  is placed in front of  "+" , "[",  "]".
+
+    console.log(escaped);
+    // dea\+hl\[\]rd
+
+    //now use "escaped" instead of "name".
+    var regexp = new RegExp("\\b(" + escaped + ")\\b", "gi");
+
+    console.log(text.replace(regexp, "_$1_"));
+    // This +dea+hl[]rd_ guy is super annoying.
