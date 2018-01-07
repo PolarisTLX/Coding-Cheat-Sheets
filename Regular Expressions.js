@@ -601,6 +601,16 @@ recall that:
 
 so a backslash \  is placed in front of  "+" , "[",  "]".
 
+[^\w\s]
+The ^ means begins, HOWEVER when a ^ is in a [],
+ie [^], means "anything that is not"
+so [^\w\s]  means:  "anything that is not a word character or a space"
+
+"\\$&"
+the & means the last match? (because there are many matches?),
+replace that match with itself plus a \ in front of it.
+
+
     console.log(escaped);
     // dea\+hl\[\]rd
 
@@ -609,3 +619,20 @@ so a backslash \  is placed in front of  "+" , "[",  "]".
 
     console.log(text.replace(regexp, "_$1_"));
     // This +dea+hl[]rd_ guy is super annoying.
+
+
+
+THE SEARCH METHOD:
+
+We cannot use the indexOf() method for strings in a RegExp.  Instead we need .search().
+.search() returns the first index on which a RegExp is found, or -1 when it is not found.
+
+console.log("  word".search(/\S/));    //\S means "not a space"
+// 2  (the first non-space character is at the 2nd index)
+
+console.log("    ".search(/\S/));
+// -1   (there are no non-space characters)
+
+
+Unlike the .indexOf() method,  .search() cannot be told an offset of when a match should start.
+
