@@ -636,3 +636,238 @@ console.log("    ".search(/\S/));
 
 Unlike the .indexOf() method,  .search() cannot be told an offset of when a match should start.
 
+THE LAST INDEX PROPERTY:
+
+JavaScript and RegExp again do not have the best solution here.
+The .exec() method does not provide a conveniant way to start searching from a specific position in a string.
+
+RegExp are objects that have properties. Some of those properties are:
+"source" - this is the string the expression was created from.
+"lastIndex" - which controls where the next index where start.
+NOTE: lastIndex only works when the global "g" is applied + does through the .exec() method.
+
+    var pattern = /y/g;
+    var match = pattern.exec("xyzzy");
+    console.log(match.index);
+    // 1
+    console.log(pattern.lastIndex);
+    // 2
+
+Same example but set the RegExp "lastIndex" to start further down:
+
+    var pattern = /y/g;
+    pattern.lastIndex = 3;
+    var match = pattern.exec("xyzzy");
+    console.log(match.index);
+    // 4
+    console.log(pattern.lastIndex);
+    // 5
+
+If there is a match, using .exec() will update the "lastIndex" property to be after the match.
+If there is no match, "lastIndex" is set back to zero (0) (where they all start from.)
+
+PROBLEM: running this multiple times on different strings can cause problems.
+
+    var digit = /\d/g;
+    console.log(digit.lastIndex);
+    // 0
+
+    console.log(digit.exec("first a long sencente that ends in 1")); // ["1"]
+    console.log(digit.lastIndex);
+    // 36
+
+    console.log(digit.exec("now a shorter example: 1")); // null
+    console.log(digit.lastIndex);
+    // 0
+
+It cannot find the match in the second example because from the previous one it starts at index of "36".
+So just sets it back to 0.
+
+Reversing the example, shorter first, then longer, works fine:
+
+    var digit = /\d/g;
+    console.log(digit.lastIndex);
+    // 0
+
+    console.log(digit.exec("now a shorter example: 1")); // null
+    console.log(digit.lastIndex);
+    // 24
+
+    console.log(digit.exec("first a long sencente that ends in 1")); // ["1"]
+    console.log(digit.lastIndex);
+    // 36
+
+
+
+
+
+FIND ALL OCCURRENCES BY LOOPING OVER MATCHES WITH .exec(), lastIndex AND "while":
+
+var string = "1 string with several numbers in it... 42...30.";
+var pattern = /\b(\d+)\b/g;
+var match;
+while (match = pattern.exec(string)) {
+  //console.log(pattern.lastIndex);
+  console.log("Found", match[1], "at index " + match.index);
+}
+// Found 1 at index 0
+// Found 42 at index 39
+// Found 30 at index 44
+
+What happens above is that "pattern" has a "lastIndex",
+that keeps increasing with each run of pattern.exec(),
+so pattern.exec(string) is different every time.
+We are storing that value in "match".
+Though there must be a different way to do this??
+
+
+
+.MATCH + GLOBAL "g" RETURNS ALL MATCHES IN AN ARRAY:
+
+console.log("Banana".match(/an/g));
+// ["an","an"]
+
+So best to be cautious with the global "g", often best used with .replace()
+
+
+
+
+PARSING AN INI FILE:
+
+Part of a program to harvest information "from our enemies from the internet".
+
+Want to convert an INI configuration file into an array of objects,
+each with a name property and an array of settings.
+Want 1 for each section + 1 global settings at the top.
+
+The INI configuration file:
+
+    searchengine=http://www.google.com/search?q=$1
+    spitefulness=9.7
+
+    ; comments are preceded by a semicolon...
+    ; each section concerns an individual enemy
+    [larry]
+    fullname=Larry Doe
+    type=kindergarten bully
+    website=http://www.geocities.com/CapeCanaveral/11451
+
+    [gargamel]
+    fullname=Gargamel
+    type=evil sorcerer
+    outputdir=/home/marijn/enemies/gargamel
+
+
+rules for these kinds of INI files:
+
+-Blank lines and lines starting with semicolons are ignored.
+-Lines wrapped in [ and ] start a new section.
+-Lines containing an alphanumeric identifier followed by an "=" character add a setting to the current section
+-Anything else is invalid.
+
+
+Since the file has to be processed line by line,
+first split the file into seperate lines using string.split("\n");
+
+Special NOTE:  some OSs  use "\n" and some use "\r\n" for a new line.
+So use a RegExp to make the "\r" optional with "?":     /\r?\n/
+
+
+The code below goes over every line in the file,
+updating the "current section" object as it goes along.
+
+First it checks is a line can be ignored with  /^\s*(;.*)?$/
+(;.*) is to match comments.
+The "?" will make sure it also matches lines containing only whitespace.
+
+The "^" and "$"  throughout is used to make sure it matches the whole line.
+This reduces the number of errors that occurs.
+
+The pattern of if (match = line.match(...)) is similar to above example
+of finding all occurences of a pattern by looping with .exec(), lastIndex and "while":
+
+Here it is inside an if statement because you cant always be sure the match will succeed, so make it an if.
+
+To not break the chain of "if" statements,
+we assign the result of "match" to a variable
+and immediately use that assignement as the test in the if statement.
+(talking about the simple early line  "var match;" ?)
+
+
+    function parseINI(string) {
+      // Start with an object to hold the top-level fields (huh?)
+      var currentSection = {name: null, fields: []};
+      var categories = [currentSection];
+
+      string.split(/\r?\n/).forEach(function(line) {
+        var match;
+        // first check is a line can be ignored:
+        if (/^\s*(;.*)?$/.test(line)) {
+          return;
+        }
+        // if the line is not a comment,
+        // then check whether the line starts a new section with []
+        else if (match = line.match(/^\[(.*)\]$/)) {
+          // if so, create a new "currentSection" object.
+          currentSection = {name: match[1], fields: []};
+          categories.push(currentSection);
+        }
+        // last significant option is a line that is a normal setting
+        // so add this setting to the current section object.
+        else if (match = line.match(/^(\w+)=(.*)$/)) {
+          currentSection.fields.push({name: match[1], value: match[2]});
+        }
+        // any other kind of line, throw an error.
+        else {
+          throw new Error("Line '" + line + "' is invalid.");
+        }
+      });
+
+      return categories;
+    }
+
+
+
+JAVASCRIPT REGEXP DOES NOT PLAY WELL WITH ANY CHARACTER NOT IN THE ENLGISH LANGUAGE.
+
+
+SUMMARY:
+
+/\d/ any digit character
+/\w/ any word character
+/\s/ any white space character
+/./  any character EXCEPT new lines
+/\b/ a word boundary
+/^/  start of input
+/$/  End of input
+
+/abc/  A sequence of Characters
+/[abc]/  ANY character from a set of characters
+/[^abc]/ Any character BUT the ones in the set provided
+/[0-9]/ Any character in a range of characters
+/(abc)/  a group
+/a|b|c/  ANY one OF SEVERAL patterns
+/x+/  One OR MORE occurences of the pattern "x"
+/x+?/  OPTIONAL, one or more occurences, "non-greedy"
+/x*/  ZERO OR MORE occurences
+/x?/  OPTIONAL, zero or one occurence
+/x{2,4}/  between 2 and 4 occurences
+
+
+RegExp options:
+
+i  -  case insensitive
+g  -  global  (with .replace() will cause it to replace all occurences)
+
+
+(confirm these)
+.test() with "true or false" to see if a match exists.
+
+.exec()  (execute), if there is a match, returns an array containing all matched groups.
+.exec()  also has an index property of where the match was found.
+
+.match()
+.search()  returns starting index position of a match.
+
+.replace()  can replace matches of a pattern with a designated replacement string.
+.replace()  can also be passed a functin as the second argument for what to replace it with.
