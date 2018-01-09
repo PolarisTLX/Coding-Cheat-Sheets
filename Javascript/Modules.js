@@ -58,6 +58,7 @@ OBJECTS AS INTERFACES:
 
 Now we want to add another functin to our day-of-the-week module,
 that goes from day name to a number.
+
 We cant simply return the functin anymore,
 We must wrap the two functions in an object.
 
@@ -71,3 +72,48 @@ var weekDay = function() {
 
 console.log(weekDay.name(weekDay.number("Sunday")));
 // Sunday
+
+
+When you have bigger modules, gathering all the exported values into an object at the end of the functin
+becomes awkward as many of those exported functins are likely to be big.
+You would prefer to write them somewhere else, near related internal code.
+
+A good alternative is to declare an object (usually named "exports"),
+and add properties to that whenever we are defining something that needs to be exported.
+
+This next example, the module functin takes its interface object as an argument,
+(this.weekDay = {})
+allowing code outside of the functin to create it and store it in a variable.
+(Outside of a functin, "this" refers to the global scope object.)
+
+
+(function(exports) {
+  var names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  exports.name = function(number) {
+    return names[number];
+  };
+  exports.number = function(name) {
+    return names.indexOf(name);
+  };
+})(this.weekDay = {});   //<- the interface object as an argument and store in a variable
+
+console.log(weekDay.name(weekDay.number("Saturday")));
+// Saturday
+
+This pattern is commonly used in JavaScript modules intended for the browser.
+The module "claims" (?) a single global variable and wraps its code in a functins
+in order to have its own private namespace.
+But this pattern still causes problems if multiple modules happen to claim the same name,
+or if you want to load two versions of a module alongside each other.
+
+To fix this we want to DETACH FROM THE GLOBAL SCOPE:
+Some re-arranging we can allow one module to directly ask for the interface object of another module,
+and avoiding the global scope.
+
+This involves a "require" functin,
+and give it a module name, will load that modules file and return the appropriate interface value.
+
+"require" needs two things:
+1 - we want a functin "readFile", which returns the content of a given file string.
+(this is not part of vanilla ES5 JavaScript, but in things like Node.js or the browser.)
+2- Need to to able to actually execute this string as JavaScript code.
