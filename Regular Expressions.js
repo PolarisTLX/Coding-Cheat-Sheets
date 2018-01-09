@@ -833,9 +833,14 @@ JAVASCRIPT REGEXP DOES NOT PLAY WELL WITH ANY CHARACTER NOT IN THE ENLGISH LANGU
 
 SUMMARY:
 
-/\d/ any digit character
-/\w/ any word character
-/\s/ any white space character
+\d  =  same as [0-9], any digit characters
+\D  =  any character that is NOT a digit
+\w  =  any letter character,  same as [a-zA-Z] ?
+\W  =  any NON-LETTER character
+\s  =  any white space character (space, tab, newline)
+\S  =  any NON-WHITE SPACE characters
+.   =  any character except for newline (\n?)
+
 /./  any character EXCEPT new lines
 /\b/ a word boundary
 /^/  start of input
@@ -852,6 +857,152 @@ SUMMARY:
 /x*/  ZERO OR MORE occurences
 /x?/  OPTIONAL, zero or one occurence
 /x{2,4}/  between 2 and 4 occurences
+
+
+RegExp options:
+
+i  -  case insensitive
+g  -  global  (with .replace() will cause it to replace all occurences)
+
+
+(confirm these)
+.test() with "true or false" to see if a match exists.
+
+.exec()  (execute), if there is a match, returns an array containing all matched groups.
+.exec()  also has an index property of where the match was found.
+
+.match()
+.search()  returns starting index position of a match.
+
+.replace()  can replace matches of a pattern with a designated replacement string.
+.replace()  can also be passed a functin as the second argument for what to replace it with.
+
+
+
+EXERCISES:
+
+REGEXP GOLF:
+
+    function verify(regexp, yes, no) {
+      //Ignore unfinished EXERCISES
+      if (regexp.source == "...") {
+        return;
+      }
+      yes.forEach(function(s) {
+        if (!regexp.test(s)) {
+          console.log("Failure to match '" + s + "'");
+        }
+      });
+      no.forEach(function(s) {
+        if (regexp.test(s)) {
+          console.log("Unexpected match for '" + s + "'");
+        }
+      });
+      //console.log("If no error messages posted, test passed!");
+    }
+
+functin verify() will be provided with 3 arguments (regex, yes, no):
+regexp:  the pattern
+yes:   which strings should give positive match occurence with the pattern
+no:   which strings should NOT give positive match occurence with the pattern
+
+For each of the following items, write a regular expression to test a substring occuring in a string:
+
+//1. car and cat:    car|cat
+
+    //verify(/cat|car/,  //works  - 7
+    //verify(/ca(t|r)/,  //works  - 7
+    verify(/ca[tr]/,     //works  - 6
+           ["my car", "bad cats"],
+           ["camper", "high art"]);
+
+//2. pop and prop
+
+    // verify(/pop|prop/,  // works - 8
+    verify(/pr?op/,        // works - 5
+           ["pop culture", "mad props"],
+           ["plop"]);
+
+// 3. ferret, ferry, and ferrari
+
+    verify(/ferr(et|y|ari)/,  // works - 13
+           ["ferret", "ferry", "ferrari"],
+           ["ferrum", "transfer A"]);
+
+// 4. Any word ending in ious
+
+    verify(/ious\b/,  // works - 6
+           ["how delicious", "spacious room"],
+           ["ruinous", "consciousness"]);
+
+// 5. A whitespace character followed by a dot, comma, colon, or semicolon
+
+    //verify(/\s\W/,  // works - 4
+    verify(/\s[.,:;]/,  // more accurate - 8
+           ["bad punctuation ."],
+           ["escape the dot"]);
+
+// 6. A word longer than six letters
+
+    verify(/\w{7,}/,    // works - 6
+           ["hottentottententen"],
+           ["no", "hotten totten tenten"]);
+
+// 7. A word without the letter e
+
+    verify(/\b[^\We]+\b/,
+           ["red platypus", "wobbling nest"],
+           ["earth bed", "learning ape"]);
+
+    Recall that \W  =  any NON-LETTER character. So it cant be just a white space?
+
+
+
+    EXERCISE: QUOTING STYLE:
+
+    In a story, all dialogue is written with  " ' "  single quote marks.
+    Want to change them all to "" double quote marks,
+    but dont want to replace the occurences in words like "don't".
+
+    var text = "'I'm the cook, ' he said, 'I don't do the dishes.'";
+    // "I'm the cook, " he said, "I don't do the dishes."
+
+
+    // console.log(text.replace(/^\b'|'\b$/g, "\""));  // does not work
+
+    console.log(text.replace(/^'|\W'|'$|'\W/g, "\""));   // almost works (but it removes "." and white space?)
+    // "I'm the cook," he said,"I don't do the dishes"
+
+
+// need the $ method to carry over the character that was matched in \W  (commas, periods, white spaces etc)
+// and place them back in again, so they are not dropped.
+// they also need to be wrapped in () parentheses.
+
+    console.log(text.replace(/(^|\W)'|'(\W|$)/g, '$1"$2'));
+    // "I'm the cook, " he said, "I don't do the dishes."
+
+
+
+EXERCISE: NUMBERS AGAIN:
+
+Test for any valid JavaScript number.
+
+// var pattern = /^(+|-)?\d+?\.?\d+[eE]?(+|-)?\d+$/;   // does not work
+var pattern = /^(\+|-|)(\d+(\.\d*)?|\.\d+)([eE](\+|-|)\d+)?$/;
+
+(\+|-|) means + or - or nothing.
+
+//Test:
+["1", "-1", "+15", "1.55", ".5", "5.", "1.3e2", "1E-4",
+ "1e+12"].forEach(function(s) {
+  if (!pattern.test(s))
+    console.log("Failed to match '" + s + "'");
+});
+["1a", "+-1", "1.2.3", "1+1", "1e4.5", ".5.", "1f5",
+ "."].forEach(function(s) {
+  if (pattern.test(s))
+    console.log("Incorrectly accepted '" + s + "'");
+});
 
 
 RegExp options:
