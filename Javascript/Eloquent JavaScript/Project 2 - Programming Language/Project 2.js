@@ -9,7 +9,11 @@ If a text does not form a valid program, the parser should complain and print an
 
 
 Everything in Egg will be an expression.
-An expression can be a variable, a number, a string or an application.
+An expression can be:
+    -a variable
+    -a number
+    -a string
+    -an application
 
 Applications are used for functin calls,
 but also for constructs like "if" and "while"
@@ -32,7 +36,8 @@ and having any number of arguments between those (), seperated by commas. (, , ,
 
 -Since syntax has no concept of a block, we need a "do" construct to represent multiple things in sequence.
 
--Each expression object with have "type" property to indicate the kind of expression it is, and other properties to describe its content.
+-Each expression object with have "type" property to indicate the kind of expression it is,
+and other properties to describe its content.
 
 -Expression of type "value" will be for strings or numbers.
 -Their property "value" will contain the string or number.
@@ -104,8 +109,17 @@ we have to cut the whitespace off the start of the string.
 This is what the skipSpace functin helps with.
 
 Then, parseExpression uses 3 regular expressions,
-to spot (RegExp match) the 3 simple elements that Egg supports: strings, numbers and words.
+to spot (RegExp match) the 3 simple elements that Egg supports:
+-strings,
+-numbers      // <- THIS CANT BE RIGHT BASED ON ABOVE
+-and words.
 The parser constructs a different kind of data structure depending on which on matches.
+
+Review:
+"values" is either strings or numbers.
+"words" are identifiers, in the form of strings.
+
+("application" does not qualify as one of the 3 types?)
 
 If the inputed program does not match one of the 3 types (via RegExp),
 it is not a valid expression, and parser throws a SyntaxError.
@@ -229,3 +243,97 @@ and call it with the result that comes from evaluating the arguments.
 
 
 "evaluate" is also recursive similarly to "parser".
+It is possible to integrate the two "evaluate" + "parser" together,
+where the evaluate is done within "parser",
+but this would make it less readable.
+
+THIS IS ALL THAT IS NEEDED TO INTERPRET "Egg".
+
+But to do something useful with the language,
+we need to define a few "special forms" and add some useful values to the environment.
+
+
+SPECIAL FORMS
+
+The "specialForms" object is used to define special syntax in Egg.
+It associates words with functions that evaluate these special forms.
+It starts out empty, so we will now add some forms:
+
+For the "if" contruct.
+It needs exactly 3 arguments, and is similar to the ternary operator (x ? y : z):
+
+    specialForms["if"] = function(args, env) {
+      if (args.length != 3)
+        throw new SyntaxError("Bad number of args to if");
+
+      // ternary operator (x ? y : z):
+      if (evaluate(args[0], env) !== false)
+        return evaluate(args[1], env);
+      else
+        return evalutate(args[2], env);
+    };
+
+The "if" construct expects exactly 3 arguments in a ternary operator fasion.
+(x ? y : z):
+If the first provided argument, args[0] "x", is not "false",
+If then evaluates the second, args[1] "y".
+If it is false, then it will evaluate the third argument, args[2] "z".
+
+The value it produces will be  "y" or "z".
+
+Unlike JavaScript, "Egg" only teats "false" as false.
+Where as JS also treats other "falsy things" like 0 or an empty string also as "false".
+
+
+"if" needs to a special form rather than a regular functin,
+because all arguments to functions are evaluated before the functin is called.
+But "if" should evaluate EITHER "y" or "z" depending on if "x" is "false".
+
+
+The "while" form is similar:
+
+    specialForms["while"] = function(args, env) {
+      if (args.length != 2)
+        throw new SyntaxError("Bad number of args to while");
+
+      while (evaluate(args[0]), env) !== false)
+        evaluate(args[1], env);
+
+      //NOTE Since "undefined" does nothing in "Egg", we return false.
+      // for lack of a meaningful result.
+      return false;
+    };
+
+
+Another basic one that we need is "do",
+which executes all its arguments from top to bottom.
+Its value is the value produced by the last argument:
+(Dont quite understand this one properly)
+
+    specialForms["do"] = function(args, env) {
+      var value = false;
+      args.forEach(function(arg) {
+        value = evaluate(arg, env);
+      });
+      return value;
+    }
+
+
+A form called "define" is also needed to be able to create variables and give them new values.
+It expects a word as its first argument
++ a second argument that is an expression that produces the value to assign to that word.
+
+Because it is an expression like everything else, it must return a value.
+So we make it return the value that was assigned.
+(This is like JS  "=" operator ?).
+
+    specialForms["define"] = function(args, env) {
+      if (args.length != 2 || args[0].type != "word")
+        throw new SyntaxError("Bad use of define");
+      var value = evaluate(args[1], env);
+      env[args[0].name] = value;
+      return value;
+    };
+
+
+THE ENVIRONMENT
