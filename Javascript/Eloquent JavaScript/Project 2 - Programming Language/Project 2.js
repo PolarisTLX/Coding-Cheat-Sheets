@@ -129,7 +129,7 @@ along with the object for the expression, to the next part: "parseApply".
 parseApply checks whether the expression is an application.
 If it is, it parses a list of arguments in parethesis ().
 
-    function parseApply (expr, program) {
+    function parseApply(expr, program) {
       program = skipSpace(program);
       if (program[0] != "(")
         return {expr: expr, rest: program};
@@ -197,29 +197,29 @@ and it will evaluate the expresion that the tree represents,
 and return the value that this produces.
 
 
-function evaluate(expr, env) {
-  switch(expr.type) {
-    case "value":
-      return expr.value;
+    function evaluate(expr, env) {
+      switch(expr.type) {
+        case "value":
+          return expr.value;
 
-    case "word":
-      if (expr.name in env)
-        return end[expr.name]
-      else
-        throw new ReferenceError("Undefined variable: " + expr.name);
+        case "word":
+          if (expr.name in env)
+            return env[expr.name];
+          else
+            throw new ReferenceError("Undefined variable: " + expr.name);
 
-    case "apply":
-      if (expr.operator.type == "word" && expr.operator.name in specialForms)
-        return specialForms[expr.operator.name](expr.args, env);
-      var op = evaluate(expr.operator, env);
-      if (typeof op != "function")
-        throw new TypeError("Applying a non-function.");
-      return op.apply(null, expr.args.map(function(arg) {
-        return evaluate(arg, env);
-      }));
-  }
-}
-var specialForms = Object.create(null);
+        case "apply":
+          if (expr.operator.type == "word" && expr.operator.name in specialForms)
+            return specialForms[expr.operator.name](expr.args, env);
+          var op = evaluate(expr.operator, env);
+          if (typeof op != "function")
+            throw new TypeError("Applying a non-function.");
+          return op.apply(null, expr.args.map(function(arg) {
+            return evaluate(arg, env);
+          }));
+      }
+    }
+    var specialForms = Object.create(null);
 
 The "evaluator" has code for each of the expression types.
 An expression that is a literal value, simply produces its value.
@@ -270,7 +270,7 @@ It needs exactly 3 arguments, and is similar to the ternary operator (x ? y : z)
       if (evaluate(args[0], env) !== false)
         return evaluate(args[1], env);
       else
-        return evalutate(args[2], env);
+        return evaluate(args[2], env);
     };
 
 The "if" construct expects exactly 3 arguments in a ternary operator fasion.
@@ -296,7 +296,7 @@ The "while" form is similar:
       if (args.length != 2)
         throw new SyntaxError("Bad number of args to while");
 
-      while (evaluate(args[0]), env) !== false)
+      while (evaluate(args[0], env) !== false)
         evaluate(args[1], env);
 
       //NOTE Since "undefined" does nothing in "Egg", we return false.
@@ -316,7 +316,7 @@ Its value is the value produced by the last argument:
         value = evaluate(arg, env);
       });
       return value;
-    }
+    };
 
 
 A form called "define" is also needed to be able to create variables and give them new values.
@@ -337,3 +337,107 @@ So we make it return the value that was assigned.
 
 
 THE ENVIRONMENT
+
+The environment "env" accepted by "evaluate" is an object with properties,
+whose names correspond to variable names,
+and whose values correspond to the values that those variables are bound to.
+Now we wil define an environment object that represents the global scope.
+
+To be able to use the "if" construct above, we must have access to Boolean values.
+Since there is only 2 Boolean values, "true" or "false",
+we dont need special syntax for them.
+We just bind these two variables to the "true" and "false".
+
+    var topEnv = Object.create(null);
+
+    topEnv["true"] = true;
+    topEnv["false"] = false;
+
+
+We can now evaluate a simple expression that uses a Boolean.
+This expression negates a Boolean value?
+
+    var prog = parse("if(true, false, true)");
+    console.log(evaluate(prog, topEnv));
+    // false
+
+Is it the idea of if(x ? y : z)?
+So x = true, thus y is returned, and y = false, so the returned value is y, false?
+Might try in reverse order to see.
+
+    var prog = parse("if(true, true, false)");
+    console.log(evaluate(prog, topEnv));
+    // true
+    var prog = parse("if(false, false, true)");
+    console.log(evaluate(prog, topEnv));
+    // true
+    var prog = parse("if(false, true, false)");
+    console.log(evaluate(prog, topEnv));
+    // false
+
+My theory was correct!
+
+
+
+
+To make basic arithmatic and comparison operators work,
+we will add some functin values to the environment.
+To keep the code short, we use "new Function" to synthesize a bunch of operators in a loop,
+instead of defining them all individually.
+
+    ["+", "-", "*", "/", "==", "<", ">"].forEach(function(op) {
+      topEnv[op] = new Function("a, b", "return a " + op + " b;");
+    });
+
+"op" is each item in the array, one at time.
+So first is makes:
+return a + b;
+return a - b;
+return a * b;
+return a / b;
+.
+.
+
+
+We also want a way to output variables, cause thats very useful,
+so we will wrap console.log in a functin and call it "print". LIKE PYTHON!!!
+
+    topEnv["print"] = function(value) {
+      console.log(value);
+      return value;
+    };
+
+
+Now we have enough elementary tools to write simple programs.
+
+Now this "run" function provides a convevient way to write and run these tools.
+It creates a fresh environment and parses and evaluates the strings we give it
+as a single program.
+
+    function run() {
+      var env = Object.create(topEnv);
+      var program = Array.prototype.slice.call(arguments, 0).join("\n");
+      return evaluate(parse(program), env);
+    }
+
+The "Array.prototype.slice.call" is a trick to turn array-like objects (such as arguments),
+into a real array so that we can use .join() on it. (.join() only works on arrays).
+It takes all the arguments given to run, and treats them as the lines of a program.
+
+
+    run("do(define(total, 0),",
+        "   define(count, 1),",
+        "   while(<(count, 11),",
+        "         do(define(total, +(total, count)),",
+        "            define(count, +(count, 1)))),",
+        "   print(total))");
+
+// 55
+
+
+This just computes the sum of the numbers 1 to 10, that weve seen before,
+But expressed in Egg!
+It is clearly uglier than the equivalent in JS,
+but not bad for a language implemented in less than 150 lines of code.
+
+//CODE WORKS UP TO HERE.
