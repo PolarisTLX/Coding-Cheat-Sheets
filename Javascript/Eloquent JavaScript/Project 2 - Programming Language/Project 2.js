@@ -441,3 +441,6 @@ It is clearly uglier than the equivalent in JS,
 but not bad for a language implemented in less than 150 lines of code.
 
 //CODE WORKS UP TO HERE.
+
+
+FUNCTIONS
