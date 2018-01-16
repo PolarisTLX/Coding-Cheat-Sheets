@@ -1,6 +1,11 @@
 Building a language that will be called Egg.
 
 
+"Egg" is simply built right on top of JavaScript.
+To build a programming language from scratch directly on the raw machine functionality,
+is many times more complex.
+"Egg" is simply meant as an exercise to demonstrate how languages are designed.
+
 PARSING:
 
 A Parser is a program that reads a piece of text and produces a data structure,
@@ -320,6 +325,12 @@ Its value is the value produced by the last argument:
 
 
 A form called "define" is also needed to be able to create variables and give them new values.
+ie. it is equivalent to:
+
+var name = value;
+&
+name = newValue;
+
 It expects a word as its first argument
 + a second argument that is an expression that produces the value to assign to that word.
 
@@ -440,7 +451,307 @@ But expressed in Egg!
 It is clearly uglier than the equivalent in JS,
 but not bad for a language implemented in less than 150 lines of code.
 
-//CODE WORKS UP TO HERE.
+
 
 
 FUNCTIONS
+
+Thankfully making a functin construct, called "fun", is not too difficult.
+It treats its last argument as the functins body,
+and all functions before that as the names of the functions arguments.
+
+    specialForms["fun"] = function(args, env) {
+      if (!args.length)
+        throw new SyntaxError("Function needs a body (length > 0).");
+      function name(expr) {
+        if (expr.type != "word")
+          throw new SyntaxError("Arg names must be words");
+        return expr.name;
+      }
+      var argNames = args.slice(0, args.length -1).map(name);
+      var body = args[args.length -1];
+
+      return function() {
+        if (arguments.length != argNames.length)
+          throw new TypeError("Wrong number of arguments.");
+        var localEnv = Object.create(env);
+        for (var i = 0; i < arguments.length; i++) {
+          localEnv[argNames[i]] = arguments[i];
+        };
+      return evaluate(body, localEnv);
+      };
+    };
+
+
+Just like in JS, functions in "Egg" have their own local environment.
+We use Object.create to make a new object
+that has access to the variables in the outer environment (its prototype),
+but that can also contain new variables without modyfying that outer scope.
+
+The functin created by the "fun" form creates this local environment
+and adds the argument variables to it.
+It then evaluates the functin body in this environment and returns the results.
+
+
+    run("do(define(plusOne, fun(a, +(a, 1))),",
+        "   print(plusOne(10)))");
+    // 11
+
+
+    run("do(define(pow, fun(base, exp,",
+        "     if(==(exp, 0),",
+        "         1,",
+        "         *(base, pow(base, -(exp, 1)))))),",
+        "   print(pow(2, 10)))");
+    // 1024
+
+
+//CODE WORKS UP TO HERE.
+
+
+
+COMPILATION
+
+Any processor that converts a program to a different representation can be thought of as "compilation".
+
+What we have built is an "interpreter".
+During evaluation, it acts directly on the representation of the program produced by the parser.
+
+"Compilation" is the process of adding another step between the parsing and the running of a program,
+this transforms the program into something that can be evaluated more efficiently,
+by doing as much work as possible in advance.
+
+For example, in good languages it is obvious, for each use of a variable,
+which variable is being reffered to, without actually running the program.
+This is useful to avoid looking up the variable by name every time it is accessed.
+Instead it is directly fetched from predetermined memory location?
+
+
+Another posible way to approach creating "Egg",
+would be a design that first converts the program to a JavaScript program,
+uses the new Function to invote the JS compiler on it,
+and then run the results.
+If done right, this would make "Egg" run very fast, while still being simple to implement.
+That would be another possible exercise.
+
+
+
+CHEATING
+
+With "Egg", when defining "if" and "while",
+they are largely just trivial wrappers around JavaScipts own "if" and "while".
+Also the values in "Egg" are just regular JS values.
+
+"Egg" is simply built right on top of JavaScript.
+To build a programming language from scratch directly on the raw machine functionality,
+is many times more complex.
+"Egg" is simply meant as an exercise to demonstrate how languages are designed.
+
+There are times when writting a small language on top of another
+is helpful to get actual real world work done.
+A "domain-specific language" is one that is tailored to express a narrow and specific task.
+
+
+
+EXERCISE - ARRAYS:
+Add support for Arrays to "Egg" by adding the following 3 functions to the top scope:
+array(...) - to construct an array containing the argument values provided (...)
+length(array) - to get an arrays length
+element(array, n) - to fetch the nth element from an array.
+
+topEnv["array"] = "...";
+topEnv["length"] = "...";
+topEnv["element"] = "...";
+
+The easiest way to do this is to represent Egg arrays with JavaScript arrays.
+The values added to the top environment must be functions.
+Array.prototype.slice can be used to convert an arguments array-like object into a regular array.
+
+
+topEnv["array"] = function(array) {
+  return Array.prototype.slice.call(arguments, 0);
+};
+
+topEnv["length"] = function(array) {
+  return array.length;
+};
+
+topEnv["element"] = function(array, n) {
+  return array[n];
+};
+
+
+
+run("do(define(sum, fun(array,",
+    "      do(define(i, 0),",
+    "         define(sum, 0),",
+    "         while(<(i, length(array)),",
+    "           do(define(sum, +(sum, element(array, i))),",
+    "              define(i, +(i, 1)))),",
+    "         sum))),",
+    "      print(sum(array(1, 2, 3))))");
+
+// 6
+
+
+EXERCISE - CLOSURE:
+
+Explain how the mechanism works where the "fun" functin allows "Egg"
+to "close-over" the surrounding environment, which allows the functions body
+to use local values that were visible at the time the functin was defined.
+JavaScript does this as well.
+
+
+UPDATE: BETTER EXAMPLE OF CLOSURES:
+(from Fun Fun Functions on YouTube).
+
+var me = "Bruce Wayne";
+
+function greetMe(me) {
+  console.log('Hello, ' + me + "!");
+}
+greetMe();
+
+Closure allows the function "greetMe" to have access to the global variable "me".
+If JavaScript did not allow closure like this, it would have to be written this way:
+
+function greetMe(me) {
+  console.log('Hello, ' + me + "!");
+}
+greetMe('Bruce Wayne');  //the desires name would have to be passed directly as an argument to the function.
+
+
+It is apparently important that with closure, it is not just making a snapshot copy of "me".
+It has proper access to the variable, and should that variable be changed,
+the functins result would appropriately change as well.
+So closure is a concept tied to "scope"?
+
+//END OF BETTER EXAMPLE from Fun Fun Functions
+
+
+To illustrate this:
+the funcin "f" returns a functin that adds its argument to "f"s argument,
+meaning that it needs access to the local scope inside "f" to be able to use variable "a".
+
+run("do(define(f, fun(a, fun(b, +(a, b)))),",
+    "   print(f(4)(5)))");
+// 9
+
+
+ANSWER:  this is again riding on JavaScript to get the equivalent in "Egg".
+SpecialForms are passed the local environment in which they are evaluated,
+so that they can evaluate the subforms in that environment.
+The functin returned by "fun" closes over the "env" argument given to its enclosing functin,
+and uses that to create the funtions local environment when it is called.
+
+This means that the prototype of the local environment will be
+the environment in which the functin was created,
+which makes it possible to access variables in that environment from the functin.
+
+That is closure in a nutshell, (though to compile it in an efficient manner requires more work).
+
+
+EXERCISE: COMMENTS:
+Make # symbols indicate comment lines like //does in JavaScript.
+
+Basically just need to modify the "parser",
+change "skipSpace" to skip comments like they are whitespace that it already does.
+
+Also: because it can now be more than one character long?
+Instead of .search(), use  either .match() or .exec(),
+so that you can get the length, so that you can slice off the right number of characters.
+
+old skipSpace:
+
+    function skipSpace(string) {
+      var first = string.search(/\S/);
+      if (first == -1) return "";
+      return string.slice(first);
+    }
+
+new skipSpace:
+
+    function skipSpace(string) {
+      // RegExp for: whitespace, or a comment, zero or more times:
+      var skippable = string.match(/^(\s|#.*)*/);
+      return string.slice(skippable.length);
+    }
+
+TESTS:
+
+console.log(parse("# hello\nx"));
+// → {type: "word", name: "x"}
+
+
+
+console.log(parse("a # one\n   # two\n()"));
+// → {type: "apply",
+//    operator: {type: "word", name: "a"},
+//    args: []}
+
+
+
+
+EXERCISE - FIXING SCOPE:
+
+Only way to assign variables values ie:
+
+var name = value;   &   name = newValue;
+
+Is with the form "define".
+
+because the same "define" does both,
+it can cause issues when you try to give non-local scoped variables a new value.
+You can end up having defined a global AND a local variable of the same name.
+
+TASK: add a special form "set", that is similar to "define",
+which when giving a variable a new value, updates the variable in the outer scope,
+or is variable does not exist, throw a ReferenceError.
+
+Weird JS behavior will require odd use of:
+Object.prototype.hasOwnProperty.call(scope, name);
+
+"You will have to loop through one scope at a time, using Object.getPrototypeOf to go the next outer scope. For each scope, use hasOwnProperty to find out whether the variable, indicated by the name property of the first argument to set, exists in that scope. If it does, set it to the result of evaluating the second argument to set and then return that value."
+"If the outermost scope is reached (Object.getPrototypeOf returns null) and we haven’t found the variable yet, it doesn’t exist, and an error should be thrown."
+
+"define" example:
+
+specialForms["define"] = function(args, env) {
+  if (args.length != 2 || args[0].type != "word")
+    throw new SyntaxError("Bad use of define");
+  var value = evaluate(args[1], env);
+  env[args[0].name] = value;
+  return value;
+};
+
+
+specialForms["set"] = function(args, env) {
+  //Your code here
+  if (args.length != 2 || args[0].type != "word")
+    throw new SyntaxError("Bad use of set");
+  var varName = args[0].name;
+  var value = evaluate(args[1], env);
+
+  for (var scope = env; scope; scope = Object.getPrototypeOf(scope)) {
+    if (Object.prototype.hasOwnProperty.call(scope, varName)) {
+      scope[varName] = value;
+      return value;
+    }
+  }
+  throw new ReferenceError("Error: Trying to set undefined varaible " + varName);
+};
+
+
+TEST:
+
+run("do(define(x, 4),",
+    "   define(setx, fun(val, set(x, val))),",
+    "   setx(50),",
+    "   print(x))");
+// 50
+
+run("set(quux, true)");
+// ReferenceError
+
+
+//CODE WORKS UP TO HERE

@@ -14,12 +14,20 @@ function parseExpression(program) {
 }
 
 //to remove any whitespace at the beginning of the string:
+
+//REPLACED BY MODIFIED ONE FROM EXERCIZE AT END OF CHAPTER:
 function skipSpace(string) {
   var first = string.search(/\S/);
   if (first == -1) return "";
   return string.slice(first);
 }
 
+//NEW MODIFIED ONE
+// RegExp for: whitespace, or a comment, zero or more times:
+// function skipSpace(string) {
+//   var skippable = string.match(/^(\s|#.*)*/);
+//   return string.slice(skippable[0].length);
+// }
 
 
 function parseApply(expr, program) {
@@ -141,8 +149,6 @@ console.log(evaluate(prog, topEnv));
 // false
 
 
-//CODE WORKS UP TO HERE.
-
 
 ["+", "-", "*", "/", "==", "<", ">"].forEach(function(op) {
   topEnv[op] = new Function("a, b", "return a " + op + " b;");
@@ -166,3 +172,101 @@ run("do(define(total, 0),",
     "         do(define(total, +(total, count)),",
     "            define(count, +(count, 1)))),",
     "   print(total))");
+// 55
+
+
+
+specialForms["fun"] = function(args, env) {
+  if (!args.length)
+    throw new SyntaxError("Function needs a body (length > 0).");
+  function name(expr) {
+    if (expr.type != "word")
+      throw new SyntaxError("Arg names must be words");
+    return expr.name;
+  }
+  var argNames = args.slice(0, args.length -1).map(name);
+  var body = args[args.length -1];
+
+  return function() {
+    if (arguments.length != argNames.length)
+      throw new TypeError("Wrong number of arguments.");
+    var localEnv = Object.create(env);
+    for (var i = 0; i < arguments.length; i++) {
+      localEnv[argNames[i]] = arguments[i];
+    };
+  return evaluate(body, localEnv);
+  };
+};
+
+
+run("do(define(plusOne, fun(a, +(a, 1))),",
+    "   print(plusOne(10)))");
+// 11
+
+run("do(define(pow, fun(base, exp,",
+    "     if(==(exp, 0),",
+    "         1,",
+    "         *(base, pow(base, -(exp, 1)))))),",
+    "   print(pow(2, 10)))");
+// 1024
+
+
+
+
+topEnv["array"] = function(array) {
+  return Array.prototype.slice.call(arguments, 0);
+};
+
+topEnv["length"] = function(array) {
+  return array.length;
+};
+
+topEnv["element"] = function(array, n) {
+  return array[n];
+};
+
+
+run("do(define(sum, fun(array,",
+    "      do(define(i, 0),",
+    "         define(sum, 0),",
+    "         while(<(i, length(array)),",
+    "           do(define(sum, +(sum, element(array, i))),",
+    "              define(i, +(i, 1)))),",
+    "         sum))),",
+    "      print(sum(array(1, 2, 3))))");
+// 6
+
+//CLOSURE EXERCISE:
+run("do(define(f, fun(a, fun(b, +(a, b)))),",
+    "   print(f(4)(5)))");
+// 9
+
+
+
+//COPIED ABOVE TO REPLACE ORIGINAL WHERE IT WAS FIRST INTRODUCED
+// RegExp for: whitespace, or a comment, zero or more times:
+function skipSpace(string) {
+  var skippable = string.match(/^(\s|#.*)*/);
+  return string.slice(skippable[0].length);
+}
+
+
+
+specialForms["set"] = function(args, env) {
+  //Your code here
+  if (args.length != 2 || args[0].type != "word")
+    throw new SyntaxError("Bad use of set");
+  var varName = args[0].name;
+  var value = evaluate(args[1], env);
+
+  for (var scope = env; scope; scope = Object.getPrototypeOf(scope)) {
+    if (Object.prototype.hasOwnProperty.call(scope, varName)) {
+      scope[varName] = value;
+      return value;
+    }
+  }
+  throw new ReferenceError("Error: Trying to set undefined varaible " + varName);
+};
+
+
+//CODE WORKS UP TO HERE.
