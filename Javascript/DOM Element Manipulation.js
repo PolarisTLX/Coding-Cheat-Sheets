@@ -4,7 +4,7 @@ NETWORK & THE INTERNET
 
 
 
-THE DOM:
+THE DOM:  Document Object Model
 
 Every element in the DOM is a node,
 and every node has the following properties:
@@ -36,6 +36,21 @@ EXAMPLE:
 
 This documents body does not have 3 children (h1, p, p),
 it ACTUALLY have 7 children?  (space, h1, space, p, space, p, space).
+
+There are different kinds of nodes, called "node constant types"
+Elements, like <p> or <h3>  are a kind of node.
+You mostly work with the element sort when manipulating the DOM?
+
+"node constant types":
+1. Regular elements: document.ELEMENT_NODE    =   <p>, <div>  etc.
+2. Text nodes: document.TEXT_NODE             = the actual text string within an element node like <p>
+      NOTE: Text nodes cannot have children, they are always a leaf (end of the branch)
+      ADDITIONAL NOTE: empty space is actually of TEXT_NODE type
+      that gets automatically put in between nodes (as per example above with 7 children)  (between all nodes always?)
+3. Comments: document.COMMENT_NODE            = any code you comment out with <!---->
+
+(more info if desired: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+
 
 
 
