@@ -148,31 +148,103 @@ Using   .insertBefore(paragraphs[2], paragraphs[0])
 
 CREATING A NEW NODE:
 
-.createTextNode() : creates a piece of text string that we can insert somewhere.
+document.createElement() : create regular element node type. This method takes a tag name, and returns a new empty element of that tag type. Ex (p, div, img)?
+document.createTextNode() : creates a piece of text string that we can insert somewhere.
 
 This example replaces the images in the html document with the "alt" text of each image when you click the "replace" button.
 
-<html>
-  <body>
-    <p>The <img alt = "CAT" src="https://s7d1.scene7.com/is/image/PETCO/cat-category-090617-369w-269h-hero-cutout-d?fmt=png-alpha"> in the <img alt="HAT" src="https://www.villagehatshop.com/photos/product/standard/4511390S163373/all/stovepipe-wool-felt-top-hat.jpg">.</p>
-    <button onClick="replaceImages()">Replace</button>
-  </body>
+    <html>
+      <body>
+        <p>The <img alt = "CAT" src="https://s7d1.scene7.com/is/image/PETCO/cat-category-090617-369w-269h-hero-cutout-d?fmt=png-alpha"> in the <img alt="HAT" src="https://www.villagehatshop.com/photos/product/standard/4511390S163373/all/stovepipe-wool-felt-top-hat.jpg">.</p>
+        <button onClick="replaceImages()">Replace</button>
+      </body>
 
-  <script>
-    function replaceImages() {
-      var images = document.body.getElementsByTag("img");
-      // typical pattern of a loop wont work here,
-      // because the nodelist of "images" is updated live each time we run through it,
-      // so it is length of 2, then 1 after first loop, then 0 after next loop.
-      // so you want to just start grabbing the items from the end.
-      for (var i = images.length - 1; i >= 0; i--) {
-     // var image = images[i];  //this extra variable not needed
-     // var text = document.createTextNode(image.alt);
-     // image.parentNode.replaceChild(text, image);
-        var text = document.createTextNode(images[i].alt);
-        images[i].parentNode.replaceChild(text, images[i]);
+      <script>
+        function replaceImages() {
+          var images = document.body.getElementsByTag("img");
+          // typical pattern of a loop wont work here,
+          // because the nodelist of "images" is updated live each time we run through it,
+          // so it is length of 2, then 1 after first loop, then 0 after next loop.
+          // so you want to just start grabbing the items from the end.
+          for (var i = images.length - 1; i >= 0; i--) {
+         // var image = images[i];  //this extra variable not needed
+         // var text = document.createTextNode(image.alt);
+         // image.parentNode.replaceChild(text, image);
+            var text = document.createTextNode(images[i].alt);
+            images[i].parentNode.replaceChild(text, images[i]);
+          }
+        }
+      </script>
+
+    </html>
+
+If you want a SOLID collection of NODES, AS OPPOSED TO A LIVE ONE:
+convert the collection of nodes into a real array,
+by calling the array slice method on it:
+
+    var arrayish = {0: "one", 1: "two", length: 2};
+    var real = Array.prototype.slice.call(arrayish, 0);
+    real.forEach(function(element) {  console.log(element); });
+    // one
+    // two
+
+
+document.createElement() example:
+Function defines a utility, element(element?),
+creates an element node, then treats the rest of its arguments as children of that node.
+Then is adds a simple attribution to a quote:
+(Adds more text to a element of type "<blockquote>" )
+
+    <blockquote id="quote">
+    No book can ever be finished. While working on it we learn just enough to find it immature the moment we turn away from it.
+    </blockquote>
+
+    <script>
+      function element(type) {
+        var node = document.createElement(type);
+        for (var i = 1; i < arguments.lengt; i++) {
+          var child = arguments[i];
+          if (typeof child == "string") {
+            child = document.createTextNode(child);
+          }
+          node.appendChild(child);
+        }
+        return node;
       }
-    }
-  </script>
 
-</html>
+      document.getElementById("quote").appendChild(
+        element("footer", "-",
+          element("strong", "Karl Popper"),
+          ", preface to the second edition of ",
+          element("em", "The Open Society and Its Enemies"),
+          ", 1950"));
+
+      // This creates and adds the following inside of the <blockquote> element (at the end):
+      //
+      //   <footer>
+      //     "-"
+      //     <strong>Karl Popper</strong>
+      //     ", preface to the 2nd edition of "
+      //     <em>The Open Society and Its Enemies</em>
+      //     ", 1950"
+      //   </footer>
+    <script>
+
+Thus the final HTML code in the browser will be this:
+
+    <blockquote id="quote">
+        No book can ever be finished. While working on it we learn just enough to find it immature the moment we turn away from it.
+          <footer>
+            "-"
+            <strong>Karl Popper</strong>
+            ", preface to the 2nd edition of "
+            <em>The Open Society and Its Enemies</em>
+            ", 1950"
+          </footer>
+    </blockquote>
+
+Which displays as:
+
+    No book can ever be finished. While working on it we learn just enough
+    to find it immature the moment we turn away from it.
+    -Karl Popper, preface to the 2nd edition of The Open Society and Its Enemies, 1950

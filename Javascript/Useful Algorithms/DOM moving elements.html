@@ -24,14 +24,14 @@
 
   <!-- EXAMPLE REPLACE IMAGES WITH THEIR ALT TEXT WHEN BUTTON CLICKED-->
 
-  <p>The <img alt = "CAT" src="https://s7d1.scene7.com/is/image/PETCO/cat-category-090617-369w-269h-hero-cutout-d?fmt=png-alpha"> in the <img alt="HAT" src="https://www.villagehatshop.com/photos/product/standard/4511390S163373/all/stovepipe-wool-felt-top-hat.jpg">.</p>
+  <!-- <p>The <img alt = "CAT" src="https://s7d1.scene7.com/is/image/PETCO/cat-category-090617-369w-269h-hero-cutout-d?fmt=png-alpha"> in the <img alt="HAT" src="https://www.villagehatshop.com/photos/product/standard/4511390S163373/all/stovepipe-wool-felt-top-hat.jpg">.</p>
 
   <button onclick="replaceImages()">Replace</button>
 
   <script>
     function replaceImages() {
       var images = document.body.getElementsByTagName("img");
-      // typical pattern of a loop wont work here for some reason 
+      // typical pattern of a loop wont work here for some reason
       for (var i = images.length - 1; i >= 0; i--) {
   // for (var i = 0; i = images.length -1; i++) {
      // var image = images[i];  //this extra variable not needed
@@ -42,6 +42,45 @@
 
       }
     }
+  </script> -->
+
+
+  <!--  EXAMPLE document.createElement - Adds more text to a element of type "<blockquote>" -->
+
+  <blockquote id="quote">
+  No book can ever be finished. While working on it we learn just enough to find it immature the moment we turn away from it.
+  </blockquote>
+
+  <script>
+    function element(type) {
+      var node = document.createElement(type);
+      for (var i = 1; i < arguments.length; i++) {
+        var child = arguments[i];
+        if (typeof child == "string") {
+          child = document.createTextNode(child);
+        }
+        node.appendChild(child);
+      }
+      return node;
+    }
+
+    document.getElementById("quote").appendChild(
+      element("footer", "-",
+        element("strong", "Karl Popper"),
+        ", preface to the 2nd edition of ",
+        element("em", "The Open Society and Its Enemies"),
+        ", 1950"));
+
+    // This creates and adds the following inside of the <blockquote> element (at the end):
+    //
+    //   <footer>
+    //     "-"
+    //     <strong>Karl Popper</strong>
+    //     ", preface to the 2nd edition of "
+    //     <em>The Open Society and Its Enemies</em>
+    //     ", 1950"
+    //   </footer>
+
   </script>
 
 
