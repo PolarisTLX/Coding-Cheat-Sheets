@@ -189,11 +189,12 @@ by calling the array slice method on it:
     // two
 
 
-document.createElement() example:
-Function defines a utility, element(element?),
+EXAMPLE WITH document.createElement():
+
+This functin defines a utility, element,
 creates an element node, then treats the rest of its arguments as children of that node.
 Then is adds a simple attribution to a quote:
-(Adds more text to a element of type "<blockquote>" )
+(This example adds more text to end of an element of type "<blockquote>" )
 
     <blockquote id="quote">
     No book can ever be finished. While working on it we learn just enough to find it immature the moment we turn away from it.
@@ -248,3 +249,39 @@ Which displays as:
     No book can ever be finished. While working on it we learn just enough
     to find it immature the moment we turn away from it.
     -Karl Popper, preface to the 2nd edition of The Open Society and Its Enemies, 1950
+
+
+
+ATTRIBUTES:
+
+There are some element attributes that are standard and can be accessed and interacted with
+through a property of their name itself, such as "href".
+But this applies only to a limited set of these standard (commonly used) attributes.
+
+You can still set any attribute you want on any node in HTML,
+which can be useful to store extra information within the elements in your document.
+However, these non-standard attributes cannot be accessed via the normal property method for nodes.
+Instead you have to use the methods "getAttribute" and "setAttribute" to work with them.
+
+It is recommended to use a naming convention of adding the prefix "data-"
+to any of these non-standard attributes.
+
+
+Example of manipulating non-standard attributes:
+(Anything that has attribue "data-classified" == "secret", gets removed)
+
+    <p data-classified="secret">The password is 000000.</p>
+    <p data-classified="unclassified">I have two feet.</p>
+
+    <script>
+      var allParagraphs = document.body.getElementsByTagName("p");
+      Array.prototype.forEach.call(allParagraphs, function(eachParagraph) {
+        if (eachParagraph.getAttribute("data-classified") == "secret") {
+          eachParagraph.parentNode.removeChild(eachParagraph);
+        }
+      });
+
+      // The password is 000000.  <- This gets removed
+      // I have two feet.
+
+    </script>

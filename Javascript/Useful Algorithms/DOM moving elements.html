@@ -47,7 +47,7 @@
 
   <!--  EXAMPLE document.createElement - Adds more text to a element of type "<blockquote>" -->
 
-  <blockquote id="quote">
+  <!-- <blockquote id="quote">
   No book can ever be finished. While working on it we learn just enough to find it immature the moment we turn away from it.
   </blockquote>
 
@@ -81,7 +81,27 @@
     //     ", 1950"
     //   </footer>
 
+  </script> -->
+
+
+<!-- EXAMPLE : Anything that has attribue "data-classified" == "secret", gets removed  -->
+
+  <p data-classified="secret">The password is 000000.</p>
+  <p data-classified="unclassified">I have two feet.</p>
+
+  <script>
+    var allParagraphs = document.body.getElementsByTagName("p");
+    Array.prototype.forEach.call(allParagraphs, function(eachParagraph) {
+      if (eachParagraph.getAttribute("data-classified") == "secret") {
+        eachParagraph.parentNode.removeChild(eachParagraph);
+      }
+    });
+
+    // The password is 000000.  <- This gets removed
+    // I have two feet.
+
   </script>
+
 
 
 </html>

@@ -161,6 +161,24 @@ console.log(crying.test("Boohoooohoohooo"));  // true
 
 
 
+
+FOR FCC OPEN SOURCE CONTRIBUTION - 1/19/2018
+
+tournament is <time datetime="2016-09-15">Thursday, September 15<sup>th</sup></time>.
+
+var string = '<time datetime="2016-09-15">Thursday, September 15<sup>th</sup></time>.'
+
+var time = /(\<time).*\>Thursday, September 15\<sup\>th\<\/sup\>\<\/time\>\./;
+console.log(time.test(string));
+
+var string = '<time datetime="2016-09-15">Thursday, September 15<sup>th</sup></time>.'
+
+var time2 = /(\<time).*\>.*\<\/time\>\./;
+console.log(time2.test(string));
+
+
+
+
 EXEC: (EXECUTE) INSTEAD OF TEST:
 RegExp also have .exec that will return "null" if no match was found,
 but will return an object(an array of strings) with info if there is a match:
