@@ -285,3 +285,30 @@ Example of manipulating non-standard attributes:
       // I have two feet.
 
     </script>
+
+
+EXAMPLE - SYNTAX HIGHLIGHTER:
+This looks for "<pre>" tags (which means "preformated"),
+with a "data-language" attribute,
+it crudely tries to highlight keywords for that language.
+It takes a "<pre>" element node, and a RegExp with the global "g" option,
+that matches the keywords of the programming language that the element contains.
+
+
+function highlightCode(node, keywords) {
+  var text = node.textContent;
+  node.textContent = "";  // Clear the node
+
+  var match, pos = 0;
+  while (match = keywords.exec(text)) {
+    var before = text.slice(pos, match.index);
+    node.appendChild(document.createTextNode(before));
+    // creating "<strong>" tags to make text bold?
+    var strong = document.createElement("strong");
+    strong.appendChild(document.createTextNode(match[0]));
+    node.appendChild(strong);
+    pos = keywords.lastIndex;
+  }
+  var after = text.slice(pos);
+  node.appendChild(document.createTextNode(after));
+}
