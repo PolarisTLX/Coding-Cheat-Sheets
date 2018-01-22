@@ -287,73 +287,86 @@ Example of manipulating non-standard attributes:
     </script>
 
 
-EXAMPLE - SYNTAX HIGHLIGHTER:
+EXAMPLE - MAKE TARGET WORDS BOLD:
+
+<!-- Also in seperate file, section originally called
+Highlight Syntax Example
+But this is poorly described in the book EloquentJS,
+It only shows how to make certain target words BOLD
+By adding <strong></strong> elements around them -->
+
 This looks for "<pre>" tags (which means "preformated"),
 with a "data-language" attribute,
-it crudely tries to highlight keywords for that language.
 It takes a "<pre>" element node, and a RegExp with the global "g" option,
 that matches the keywords of the programming language that the element contains.
 
-We can automatically highlight all programs on the page
+The keywords provided in this example by the RegExp are: (function|return|var)
+
+All occurences of these keywords will be made bold with <strong> around them.
 by looping over all the <pre> elements that have a data-language attribute
-and calling highlightCode on each one with the correct regular expression for the language.
+and calling highlightCode on each one with the correct RegExp for the language.
 
 
-function highlightCode(node, keywords) {
-  // grab all the text in the node:
-  var text = node.textContent;
-  // then clear it / set it to an empty string:
-  node.textContent = "";
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title></title>
+      </head>
+      <body>
 
-  // loop over all matches of the keyword expression,
-  var match, pos = 0;  //pos = position index?
-  while (match = keywords.exec(text)) {
-    // the text between them gets appended as regular text nodes (.createTextNode())
-    // the text "before" and "after"?  After is lower in the code?
-    var before = text.slice(pos, match.index);
-    node.appendChild(document.createTextNode(before));
-
-    // the text matched (the keywords),
-    // will now become text nodes wrapped in "<strong>" tags to make text bold.
-    var strong = document.createElement("strong");
-    strong.appendChild(document.createTextNode(match[0]));
-    node.appendChild(strong);
-    pos = keywords.lastIndex;
-  }
-  // the part after a keyword that was matched?
-  // just like "before", gets added/appended without bold tags
-  var after = text.slice(pos);
-  node.appendChild(document.createTextNode(after));
-}
+    <p>This example makes certain target words become bold by adding "strong" elements around them.</p>
+    <pre data-language="javascript"> function id(x) { return x; } </pre>
 
 
+    <script>
 
-var languages = {
-  javascript: /\b(function|return|var)\b/g /* ... etc */
-};
+    highlightAllCode();
 
-function highlightAllCode() {
-  var pres = document.body.getElementByTagName("pre");
-  for (var i = 0; i < pres.length; i++) {
-    var pre = pres[i];
-    var lang = pre.getAttribute("data-language");
-    if (languages.hasOwnProperty(lang)) {
-      highlightCode(pre, languages[lang]);
+    function highlightCode(node, keywords) {
+      // grab all the text in the node:
+      var text = node.textContent;
+      // then clear it / set it to an empty string:
+      node.textContent = "";
+
+      // loop over all matches of the keyword expression,
+      var match, pos = 0;  //pos = position index?
+      while (match = keywords.exec(text)) {
+        // the text between them gets appended as regular text nodes (.createTextNode())
+        // the text "before" and "after"?  After is lower in the code?
+        var before = text.slice(pos, match.index);
+        node.appendChild(document.createTextNode(before));
+
+        // the text matched (the keywords),
+        // will now become text nodes wrapped in "<strong>" tags to make text bold.
+        var strong = document.createElement("strong");
+        strong.appendChild(document.createTextNode(match[0]));
+        node.appendChild(strong);
+        pos = keywords.lastIndex;
+      }
+      // the part after a keyword that was matched?
+      // just like "before", gets added/appended without bold tags
+      var after = text.slice(pos);
+      node.appendChild(document.createTextNode(after));
     }
-  }
-}
 
+    function highlightAllCode() {
+      var pres = document.body.getElementsByTagName("pre");  // <pre>
+      for (var i = 0; i < pres.length; i++) {
+        var lang = pres[i].getAttribute("data-language");
 
-Example to support:
+        // BOOK GOT THIS WRONG
+        // AS THIS WAS PLACED OUTSIDE THE FUNCTION AND COULD NOT BE ACCESSED / was "undefined"
+        var languages = {  javascript: /\b(function|return|var)\b/g   };
 
-<p>Here it is, the identity function:</p>
-<pre data-language="javascript"> function id(x) { return x; } </pre>
-
-<script>highlightAllCode();</script>
-
-
-
-ABOVE NOT QUITE WORKING YET
+        if (languages.hasOwnProperty(lang)) {
+          highlightCode(pres[i], languages[lang]);
+        }
+      }
+    }
+    </script>
+    </body>
+    </html>
 
 
 LAYOUT
