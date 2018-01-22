@@ -294,21 +294,111 @@ it crudely tries to highlight keywords for that language.
 It takes a "<pre>" element node, and a RegExp with the global "g" option,
 that matches the keywords of the programming language that the element contains.
 
+We can automatically highlight all programs on the page
+by looping over all the <pre> elements that have a data-language attribute
+and calling highlightCode on each one with the correct regular expression for the language.
+
 
 function highlightCode(node, keywords) {
+  // grab all the text in the node:
   var text = node.textContent;
-  node.textContent = "";  // Clear the node
+  // then clear it / set it to an empty string:
+  node.textContent = "";
 
-  var match, pos = 0;
+  // loop over all matches of the keyword expression,
+  var match, pos = 0;  //pos = position index?
   while (match = keywords.exec(text)) {
+    // the text between them gets appended as regular text nodes (.createTextNode())
+    // the text "before" and "after"?  After is lower in the code?
     var before = text.slice(pos, match.index);
     node.appendChild(document.createTextNode(before));
-    // creating "<strong>" tags to make text bold?
+
+    // the text matched (the keywords),
+    // will now become text nodes wrapped in "<strong>" tags to make text bold.
     var strong = document.createElement("strong");
     strong.appendChild(document.createTextNode(match[0]));
     node.appendChild(strong);
     pos = keywords.lastIndex;
   }
+  // the part after a keyword that was matched?
+  // just like "before", gets added/appended without bold tags
   var after = text.slice(pos);
   node.appendChild(document.createTextNode(after));
 }
+
+
+
+var languages = {
+  javascript: /\b(function|return|var)\b/g /* ... etc */
+};
+
+function highlightAllCode() {
+  var pres = document.body.getElementByTagName("pre");
+  for (var i = 0; i < pres.length; i++) {
+    var pre = pres[i];
+    var lang = pre.getAttribute("data-language");
+    if (languages.hasOwnProperty(lang)) {
+      highlightCode(pre, languages[lang]);
+    }
+  }
+}
+
+
+Example to support:
+
+<p>Here it is, the identity function:</p>
+<pre data-language="javascript"> function id(x) { return x; } </pre>
+
+<script>highlightAllCode();</script>
+
+
+
+ABOVE NOT QUITE WORKING YET
+
+
+LAYOUT
+
+A browser computes a layout by giving each element a size and position
+based on their element type and the content.
+
+Block elements VS inline-ELEMENTS
+
+Block elements take up a whole width of the page, and are rendered on seperate lines.
+Ex: <p>, <h1>
+
+inline-elements dont take up the whole width by themselves,
+are rendered on the same line as their surrounding text.
+Ex: <a>, <strong>
+
+Recall that each element has a size and position, JavaScript is able to access these details.
+
+Properties of elements:
+
+offsetWidth / offsetHeight : give you the space the element takes up in pixels.
+clientWidth / clientHeight : give you the size and space of the element WITHOUT its border thickness.
+                             Or can view it as the space inside the element.
+
+
+    <p style="border: 3px solid red">"I'm boxed in"</p>
+
+    <script>
+      var para = document.body.getElementsByTagName("p")[0];
+      console.log("clientHeight:", para.clientHeight);
+      // 18     (this does is the smaller size as it does not have the border included)
+      console.log("offsetHeight:", para.offsetHeight);
+      // 24    (this includes 3px border on both sides)
+    </script>
+
+
+THE BEST WAY TO GET A PRECISE POSITION OF AN ELEMENT:
+getBoundingClientRect
+
+this object returns the.. bounding client rectangle?
+it has a top, bottom, left and right properties.
+The pixel co-ordinates of the element relative to the top left of the screen, which is (0,0)
+
+
+TO GET POSITION RELATIVE TO WHOLE DOCUMENT VS RELATIVE TO TOP OF SCREEN:
+Must add the current scrool position x and y:
+pageXOffset
+pageYOffset
