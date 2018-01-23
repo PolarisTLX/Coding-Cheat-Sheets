@@ -374,7 +374,7 @@ LAYOUT
 A browser computes a layout by giving each element a size and position
 based on their element type and the content.
 
-Block elements VS inline-ELEMENTS
+Block-elements VS inline-elements
 
 Block elements take up a whole width of the page, and are rendered on seperate lines.
 Ex: <p>, <h1>

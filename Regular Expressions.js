@@ -91,7 +91,7 @@ console.log(/\d+/.test("abc"));   // false
 console.log(/\d+/.test(" "));     // false
 
 the * symbol after a character, it means "NONE OR MORE" of that character.
-(the * is less useful)
+(the * is less useful?)
 
 console.log(/\d*/.test("123"));   // true
 console.log(/\d*/.test("abc"));   // true
