@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+
+<p><span id="one"></span></p>
+<p><span id="two"></span></p>
+<p><span id="three"></span></p>
+<p><span id="four"></span></p>
+<p><span id="five"></span></p>
+
+<script>
+  // this just measures the time a function takes
+  function time(name, action) {
+    var start = Date.now();  // Current time in milliseconds
+    action();
+    console.log(name, "function took", Date.now() - start, "ms");
+  }
+
+
+  // this is the slow function
+  // it adds 1 X at a time and calculates "offsetWidth" each time.
+  time("naive", function() {
+    var target = document.getElementById("one");
+    // Keep adding an "X" until the offsetWidth = 2000px
+    // this involves recalculating the offsetWidth EACH TIME!
+    while (target.offsetWidth < 2000) {
+      target.appendChild(document.createTextNode("X"));
+    }
+    console.log('"naive" is ' + target.offsetWidth + ' px wide');
+  });
+  // naive function took 250 ms
+
+
+  // this is the faster function.
+  // it only measures offsetWidth ONCE.
+  time("clever", function() {
+    var target = document.getElementById("two");
+    // first add 1 set of 5 "XXXXX".
+    target.appendChild(document.createTextNode("XXXXX"));
+    // now measure the target's width/5 (width of one X)
+    // then calculate "Total" which is how many "X" fit in 2000px
+    var total = Math.ceil(2000 / (target.offsetWidth / 5));
+    // not add "total" number of more "X"s to it.
+    for (var i = 5; i < total; i++) {
+      target.appendChild(document.createTextNode("X"));
+    }
+    console.log('"clever" is ' + target.offsetWidth + ' px wide');
+  });
+  // clever function took 1ms
+
+
+  // this is my version of the faster function "clever".
+  // to see what happens when you only add one "X" first, instead of 5 "X"s
+  time("myVersion", function() {
+    var target = document.getElementById("three");
+    // first add first "X". (just 1)
+    target.appendChild(document.createTextNode("X"));
+    // now measure the target's width (width of one X)
+    // then calculate "Total" which is how many "X" fit in 2000px
+    var total = Math.ceil(2000 / target.offsetWidth);
+    // not add "total" number of more "X"s to it.
+    for (var i = 1; i < total; i++) {
+      target.appendChild(document.createTextNode("X"));
+    }
+    console.log('"myVersion" is ' + target.offsetWidth + ' px wide');
+  });
+  // myVersion function took 2ms
+
+
+
+  // this is the clever function with 2 "X"s to see if more accurate.
+  // it only measures offsetWidth ONCE.
+  time("clever2X", function() {
+    var target = document.getElementById("four");
+    // first add 1 set of 2 "XX".
+    target.appendChild(document.createTextNode("XX"));
+    // now measure the target's width/2 (width of one X)
+    // then calculate "Total" which is how many "X" fit in 2000px
+    var total = Math.ceil(2000 / (target.offsetWidth / 2));
+    // not add "total" number of more "X"s to it.
+    for (var i = 2; i < total; i++) {
+      target.appendChild(document.createTextNode("X"));
+    }
+    console.log('"clever2X" is ' + target.offsetWidth + ' px wide');
+  });
+  // clever2X function took 4ms
+
+
+  // this is the clever function with 2 "X"s to see if more accurate.
+  // it only measures offsetWidth ONCE.
+  time("clever10X", function() {
+    var target = document.getElementById("five");
+    // first add 1 set of 10 "X"s.
+    target.appendChild(document.createTextNode("XXXXXXXXXX"));
+    // now measure the target's width/10 (width of one X)
+    // then calculate "Total" which is how many "X" fit in 2000px
+    var total = Math.ceil(2000 / (target.offsetWidth / 10));
+    // not add "total" number of more "X"s to it.
+    for (var i = 10; i < total; i++) {
+      target.appendChild(document.createTextNode("X"));
+    }
+    console.log('"clever10X" is ' + target.offsetWidth + ' px wide');
+  });
+  // clever10X function took 13ms
+
+  </script>
+
+</body>
+</html>
