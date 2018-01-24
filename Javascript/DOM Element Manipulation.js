@@ -412,6 +412,159 @@ The pixel co-ordinates of the element relative to the top left of the screen, wh
 
 
 TO GET POSITION RELATIVE TO WHOLE DOCUMENT VS RELATIVE TO TOP OF SCREEN:
-Must add the current scrool position x and y:
+Must add the current scroll position x and y:
 pageXOffset
 pageYOffset
+
+
+//CODE AND COFFEE ADDITION 23-Jan-2018
+
+PROBLEM:
+When a program repeatidly reads DOM Layout information, and changing the DOM,
+will run very slowly, because it forces a lot of layouts to happen,
+and laying out a document is computationally intensive.
+
+When a program asks for the position or size of something by reading properties,
+such as offsetHeight and getBoundingClientRect,
+this requires the browser to compute a layout each time.
+
+EXAMPLE OF JS PROGRAM THAT MAKES LOTS OF DOM LAYOUT REQUESTS AND SO RUNS SLOWLY:
+
+It is 3 programs with different ways tot build up a line of X characters that is 2,000 pixels wide.
+and measures the time each one takes.
+a seperate file tries more variations.
+Conclusion is that doing a first action of adding an X (appending),
+then making 1 measurement of "offsetWidth" to calculate how many more "X"s are needed,
+is much faster than calculating "offsetWidth" each time until you reach 2,000 px wide.
+
+You can increase the final accuracy by adding something like 5 "X"s in that first step,
+and then devide that elements new width by 5. You get a more accurate width of "X",
+and a final width that is closer to 2,000.
+
+
+    <p><span id="one"></span></p>
+    <p><span id="two"></span></p>
+
+    <script>
+        // this just measures the time a function takes
+        function time(name, action) {
+          var start = Date.now();  // Current time in milliseconds
+          action();
+          console.log(name, "function took", Date.now() - start, "ms");
+        }
+
+
+        // this is the slow function
+        // it adds 1 X at a time and calculates "offsetWidth" each time.
+        time("naive", function() {
+          var target = document.getElementById("one");
+          // Keep adding an "X" until the offsetWidth = 2000px
+          // this involves recalculating the offsetWidth EACH TIME!
+          while (target.offsetWidth < 2000) {
+            target.appendChild(document.createTextNode("X"));
+          }
+          console.log('"naive" is ' + target.offsetWidth + ' px wide');
+        });
+        // naive function took 250 ms
+
+
+        // this is the faster function.
+        // it only measures offsetWidth ONCE.
+        time("clever", function() {
+          var target = document.getElementById("two");
+          // first add 1 set of 5 "XXXXX".
+          target.appendChild(document.createTextNode("XXXXX"));
+          // now measure the target's width/5 (width of one X)
+          // then calculate "Total" which is how many "X" fit in 2000px
+          var total = Math.ceil(2000 / (target.offsetWidth / 5));
+          // not add "total" number of more "X"s to it.
+          for (var i = 5; i < total; i++) {
+            target.appendChild(document.createTextNode("X"));
+          }
+          console.log('"clever" is ' + target.offsetWidth + ' px wide');
+        });
+        // clever function took 1ms
+
+
+        // this is my version of the faster function "clever".
+        // to see what happens when you only add one "X" first, instead of 5 "X"s
+        time("myVersion", function() {
+          var target = document.getElementById("three");
+          // first add first "X". (just 1)
+          target.appendChild(document.createTextNode("X"));
+          // now measure the target's width (width of one X)
+          // then calculate "Total" which is how many "X" fit in 2000px
+          var total = Math.ceil(2000 / target.offsetWidth);
+          // not add "total" number of more "X"s to it.
+          for (var i = 1; i < total; i++) {
+            target.appendChild(document.createTextNode("X"));
+          }
+          console.log('"myVersion" is ' + target.offsetWidth + ' px wide');
+        });
+        // myVersion function took 2ms
+      </script>
+
+
+
+STYLING:
+
+Some styling of text is built into certain element types.
+Examples:
+  <strong> makes text bold,
+  <a> makes text blue and underlined (plus adds click to go there functionality)
+
+Things like text color or underlining can be changed by us with JS using the "style" property.
+
+    <p><a href=".">Normal link</a></p>
+    <p><a href="." style="color: green">Green link</a></p>
+
+The "style" property can have one or more "declerations"
+"decleration" ex:  "color: green".
+2 "decleration"s ex:  "color: green; border: solid".  ( semicolon ";" between each decleration)
+
+
+    This text is displayed <strong>inline as normal</strong>,
+    more text to show more normal inline text (does not skip a line to take up its own line),
+    <strong style="display: block">as a block, which skips to next line to take up its own line</strong>, and
+    <strong style="display: none">will not show up at all</strong>.
+
+
+Using "display: none" is often a useway way to temporarily hide elements.
+
+To use JS to manipulate these characteristics requires:
+targeting a node, such as by their Id or TagName,
+then using the ".style" property.  Ex:
+
+    <p id="paragraph" style="color: purple">Pretty text</p>
+    <div id="myDiv">
+      <p>P tag inside a div</p>
+      <p>Another P tag inside the same div</p>
+    </div>
+
+    <script>
+        var paragraph = document.getElementById("paragraph");
+        console.log(paragraph.style.color);
+        paragraph.style.color = "red";
+
+        // modify all the <p> tags inside a div.
+        // seems to require that div have an Id
+        // then going through each tag inside that div
+        // cant seem to just measure how many there are (no length property?)
+        // so just go until one returns as "undefined"
+        var theDiv = document.getElementById("myDiv");
+        var i = 0;
+        while (theDiv.getElementsByTagName("P")[i] != undefined) {
+          theDiv.getElementsByTagName("P")[i].style.backgroundColor = "red";
+          i++;
+        }
+    </script>
+
+NOTE: getting all elements inside a DIV is... awkward, thus must be a better way?
+At least I got the above to work.
+
+SPECIAL NOTE:  some style properties have dashes "-"  like "font-family".
+In JS those are re-written with their dashes removed and second word capitalised.
+Ex: style.fontFamily.
+Or style["font-family"]  works too?
+
+//END OF CODE AND COFFEE ADDITION 23-Jan-2018
