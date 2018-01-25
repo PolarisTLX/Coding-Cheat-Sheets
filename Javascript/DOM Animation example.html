@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+   <!-- Example - make an image sway back and forth: -->
+
+    <p style="text-align: center">
+      <img style="position: relative" src="https://cdn.shopify.com/s/files/1/2148/9963/products/product-image-461462507_1024x1024.jpg?v=1508658927">
+    </p>
+
+    <script>
+    var RnM = document.querySelector("img");
+    var angle = 0
+    var lastTime = null;
+    
+    function animate(time) {
+      if (lastTime != null) {
+        angle += (time - lastTime) * 0.001;
+      }
+      lastTime = time;
+      RnM.style.top = (Math.sin(angle) * 20) + "px";
+      RnM.style.left = (Math.cos(angle) * 200) + "px";
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+    </script>
+
+  </body>
+</html>

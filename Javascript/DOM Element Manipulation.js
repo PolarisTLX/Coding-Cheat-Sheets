@@ -568,3 +568,125 @@ Ex: style.fontFamily.
 Or style["font-family"]  works too?
 
 //END OF CODE AND COFFEE ADDITION 23-Jan-2018
+
+
+CASCADING STYLES:
+Basic CSS rules and overview.
+
+When multiple style rules for a property are defined,
+the most recently read rule wins and is applied.
+
+A style attribute applied directly to a node element have the highest precedence.
+<p style="color: purple">This text will always be purple except for JS manipulation.</p>
+
+CSS SPECIFICITY:
+Within CSS file rules, or CSS rules in a <style></style> tag in the HTML document,
+Rules that target more specifically (read more deeply) a specific target, will take higher precedence.
+
+
+CSS NOTATION FOR DIRECT CHILDREN ONLY  VS DIRECT + INDIRECT CHILDREN:
+p > a {...}  =  applies styles ONLY to <a> elements that are direct children of <p> elements.
+p a {...} = applies style to ALL <a> elements that are inside of <p> elements, direct and indirect children.
+
+
+
+QUERY SELECTORS:
+
+This syntax is an effective way to find elements in teh DOM.
+
+The .querySelectorAll() method takes a string as its argument,
+and returns an "array-like object" containing all the elements that it finds that match the string you provided.
+
+    <p>Questions of <span class="concept">science</span></p>
+    <p><span class="concept">Numbers</span> and <span class="concept">figures</span></p>
+    <h3>Pulling the <span class="concept">puzzles</span> appart</h3>
+    <p>Do not speak as loud as my <span class="emotion"><span class="concept">heart</span></span></p>
+
+    <script>
+      function count(selector) {
+        // how many of a target item are present in the document:
+        return document.querySelectorAll(selector).length;
+      }
+
+    console.log(count("p"));  //all <p> elements
+    // 3
+    console.log(count(".concept"));  //all elements with class "concept"
+    // 5
+    console.log(count("p .concept"));  //elements with class "concept" INSIDE a <p> element
+    // 4
+    console.log(count("p > .concept"));  // elements with class "concept" that are DIRECT CHILDREN of a <p> element
+    // 3
+
+    </script>
+
+.querySelector()  (not "All") is similar but only returns the first element that matches,
+or null if there are no matches.
+This is useful if trying to target only the first match.
+
+NOTE: the object returned by .querySelectorAll()  is not live,
+It wont change when yopu change the document.
+unlike other methods like .getElementsByTagName.
+
+
+POSITION AND ANIMATING:
+style="position: relative"
+The position property has powerful infulence on a documents layout.
+
+The default is "position: static", which means the element sits in a normal place in the document.
+
+"position: relative" means that you have additional ability,
+ to move it using the style properties of "top" and "left",
+ to move it "relative" to its normal place.
+
+ "position: absolute" means that element no longer takes up its own space in the document,
+ it can overlap other elements.
+ It can also use "top" and "left" properties,
+ but they position it relative to the top-left corner of the document.
+ OR, if the element is enclosed by another element (whose position property is not "static"),
+ it will be positioned relative to that enclosing elements top-left corner.
+
+
+These can be used to create an animation:
+Example - make an image sway back and forth:
+
+    <p style="text-align: center">
+      <img style="position: relative" src="https://cdn.shopify.com/s/files/1/2148/9963/products/product-image-461462507_1024x1024.jpg?v=1508658927">
+    </p>
+
+    <script>
+    var RnM = document.querySelector("img");
+    var angle = 0
+    var lastTime = null;
+
+    function animate(time) {
+      if (lastTime = != null) {
+        angle += (time - lastTime) * 0.001;
+      }
+      lastTime = time;
+      RnM.style.top = (Math.sin(angle) * 20) + "px";
+      RnM.style.left = (Math.cos(angle) * 200) + "px";
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+    </script>
+
+
+requestAnimationFrame() is needed because if we just updated the location of the image in a plain loop,
+the page would freeze, nothing would show on the screen, and no interactions would be allowed by the browser.
+
+The current time is passed as an argument to our animation functin,
+which it compares to the last time is saw before (var "lastTime"),
+this ensures the motion per milliseconds is smooth.
+
+Math.sin  affects the Y-coordinate, thus it is attributed to image.style.top
+Math.cos  affects the X-coordinate, thus it is attributed to image.style.left
+They are given an "angle", which is calculated from the time.
+
+"angle" increments in proportion to the elapsed time.
+IMPORTANT: "px" must be added because styles need to be provided units.
+
+
+
+EXERCISES:
+
+BUILD A TABLE:

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+
+    <p>Questions of <span class="concept">science</span></p>
+    <p><span class="concept">Numbers</span> and <span class="concept">figures</span></p>
+    <h3>Pulling the <span class="concept">puzzles</span> appart</h3>
+    <p>Do not speak as loud as my <span class="emotion"><span class="concept">heart</span></span></p>
+
+    <script>
+      function count(selector) {
+        // how many of a target item are present in the document:
+        return document.querySelectorAll(selector).length;
+      }
+
+    console.log(count("p"));  //all <p> elements
+    // 3
+    console.log(count(".concept"));  //all elements with class "concept"
+    // 5
+    console.log(count("p .concept"));  //elements with class "concept" INSIDE a <p> element
+    // 4
+    console.log(count("p > .concept"));  // elements with class "concept" that are DIRECT CHILDREN of a <p> element
+    // 3
+
+  </script>
+
+  </body>
+</html>
