@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+
+    <style>
+        /* this defines a cleaner look for tables? */
+        table { border-collapse: collapse; }
+        td, th { border: 1px solid black; padding: 3px 8px; }
+        th { text-align: left; }
+    </style>
+
+    <script>
+
+    var MOUNTAINS = [
+      {name: "Kilimanjaro", height: 5895, country: "Tanzania"},
+      {name: "Everest", height: 8848, country: "Nepal"},
+      {name: "Mount Fuji", height: 3776, country: "Japan"},
+      {name: "Mont Blanc", height: 4808, country: "Italy/France"},
+      {name: "Vaalserberg", height: 323, country: "Netherlands"},
+      {name: "Denali", height: 6168, country: "United States"},
+      {name: "Popocatepetl", height: 5465, country: "Mexico"}
+    ];
+
+
+        function buildTable(data) {
+          // create the <table> element
+          var table = document.createElement("table");
+
+          // grab all the keys from "MOUNTAINS":
+          var headTitles = Object.keys(data[0]);  // ["name", "height", "country"]
+          // create the first row <tr>:
+          var headRow = document.createElement("tr");
+          // loop with forEach() through each title:
+          headTitles.forEach(function(headTitle) {
+            // create a headline cell <th>:
+            var headCell = document.createElement("th");
+            // each of the headTitle in headTitles, ["name", "height", "country"],
+            // will be made the text content of a headCell:
+            headCell.textContent = headTitle;
+            // each of these headCells, now with text content,
+            // will be added/appended to the headRow:
+            headRow.appendChild(headCell);
+          });
+          // now add/append the headRow to the table:
+          table.appendChild(headRow);
+
+
+          // now the row of regular cells:
+          data.forEach(function(info) {
+            // create the 2nd row <tr>:
+            var normRow = document.createElement("tr");
+            // loop with forEach() through each title (key):
+            headTitles.forEach(function(headTitle) {
+              // create normal cells <td>:
+              var normCell = document.createElement("td");
+              // the content in the cell is the value (info) of each key (headTitle):
+              normCell.textContent = info[headTitle];
+
+              // extra challenge, align numbers to the right:
+              if (typeof info[headTitle] == "number") {
+                normCell.style.textAlign = "right";
+              }
+
+              // add/append each normCell to the row:
+              normRow.appendChild(normCell);
+            });
+            // add/append the 2nd row to the table:
+            table.appendChild(normRow);
+          });
+          // this ...creates the closing </table> element tag?
+          return table;
+        }
+
+        document.body.appendChild(buildTable(MOUNTAINS));
+    </script>
+
+  </body>
+</html>

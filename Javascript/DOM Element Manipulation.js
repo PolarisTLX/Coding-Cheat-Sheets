@@ -690,3 +690,161 @@ IMPORTANT: "px" must be added because styles need to be provided units.
 EXERCISES:
 
 BUILD A TABLE:
+
+A table in HTML:
+
+<tr> = Row
+<th> = headline cells (top of a row typically)
+<td> = regular cells
+
+<table>
+  <tr>
+      <th>name</th>
+      <th>height</th>
+      <th>country</th>
+  </tr>
+  <tr>
+      <td>Kilimanjaro</td>
+      <td>5895</td>
+      <td>Tanzania</td>
+  </tr>
+</table>
+
+-Write a functin called buildTable that, when you provide an array of objects,
+builds up a table (in the DOM structure).
+-First row should have headline <th> elements.
+-Second row with regular <td> elements.
+-Lastly, all cells containing numbers should be right-aligned,
+by setting their style.textAlign property to "right".
+
+
+// provided, but this has to go in the <script> section
+var MOUNTAINS = [
+  {name: "Kilimanjaro", height: 5895, country: "Tanzania"},
+  {name: "Everest", height: 8848, country: "Nepal"},
+  {name: "Mount Fuji", height: 3776, country: "Japan"},
+  {name: "Mont Blanc", height: 4808, country: "Italy/France"},
+  {name: "Vaalserberg", height: 323, country: "Netherlands"},
+  {name: "Denali", height: 6168, country: "United States"},
+  {name: "Popocatepetl", height: 5465, country: "Mexico"}
+];
+
+
+Hints:
+-Object.keys functin will probably be helpful.
+It returns an array containing the property names that an object has.
+- .createElement() to create element nodes.
+- .createTextNode() to create text nodes.
+- .appendChild() to put nodes into other nodes.
+- loop twice through the key names to fill the top row of headline cells,
+and then again to fill the regular row of cells.
+- finish off the functin with the closing </table> element.
+
+
+
+
+<style>
+    /* this defines a cleaner look for tables? */
+    table { border-collapse: collapse; }
+    td, th { border: 1px solid black; padding: 3px 8px; }
+    th { text-align: left; }
+</style>
+
+<script>
+    function buildTable(data) {
+      // create the <table> element
+      var table = document.createElement("table");
+
+      // grab all the keys from "MOUNTAINS":
+      var headTitles = Object.keys(data[0]);  // ["name", "height", "country"]
+      // create the first row <tr>:
+      var headRow = document.createElement("tr");
+      // loop with forEach() through each title:
+      headTitles.forEach(function(headTitle) {
+        // create a headline cell <th>:
+        var headCell = document.createElement("th");
+        // each of the headTitle in headTitles, ["name", "height", "country"],
+        // will be made the text content of a headCell:
+        headCell.textContent = headTitle;
+        // each of these headCells, now with text content,
+        // will be added/appended to the headRow:
+        headRow.appendChild(headCell);
+      });
+      // now add/append the headRow to the table:
+      table.appendChild(headRow);
+
+
+      // now the row of regular cells:
+      data.forEach(function(info) {
+        // create the 2nd row <tr>:
+        var normRow = document.createElement("tr");
+        // loop with forEach() through each title (key):
+        headTitles.forEach(function(headTitle) {
+          // create normal cells <td>:
+          var normCell = document.createElement("td");
+          // the content in the cell is the value (info) of each key (headTitle):
+          normCell.textContent = info[headTitle];
+
+          // extra challenge, align numbers to the right:
+          if (typeof info[headTitle] == "number") {
+            normCell.style.textAlign = "right";
+          }
+
+          // add/append each normCell to the row:
+          normRow.appendChild(normCell);
+        });
+        // add/append the 2nd row to the table:
+        table.appendChild(normRow);
+      });
+      return table;
+    }
+
+    document.body.appendChild(buildTable(MOUNTAINS));
+</script>
+
+
+EXERCISE: ELEMENTS BY TAG NAME:
+
+Create your own manual version of the built-in method .getElementsByTagName().
+
+It needs to return all child elements with a given tag name.
+It will take as arguments a node and a string for the tag name.
+It will return an array containing all descendent element nodes,
+with target tag name.
+
+Use the tagName property to find the name of elements.
+However this will return the tag name in UPPERCASE,
+so use toLowerCase to compensate for this.
+
+
+<h1>Heading with a <span>span</span> element.</h1>
+<p>A paragraph with <span>one</span>, <span>two</span> spans.<p>
+
+<script>
+ function byTagName(node, tagName) {
+   var found = [];
+   tagName = tagName.toUpperCase();
+
+   function explore(node) {
+     for (var i = 0; i < node.childNodes.length; i ++) {
+       var child = node.childNodes[i];
+       if (child.nodeType == document.ELEMENT_NODE) {
+         if (child.nodeName == tagName) {
+           found.push(child);
+         }
+         explore(child);
+       }
+     }
+   }
+   explore(node);
+   return found;
+ }
+
+ console.log(byTagName(document.body, "h1").length);
+ // 1
+ console.log(byTagName(document.body, "span").length);
+ // 3
+ var paragraph = document.querySelector("p");
+ console.log(byTagName(paragraph, "span").length);
+ // 2
+</script>
