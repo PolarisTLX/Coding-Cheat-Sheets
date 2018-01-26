@@ -822,20 +822,34 @@ so use toLowerCase to compensate for this.
 
 <script>
  function byTagName(node, tagName) {
+   // empty array to store all the found occurences
    var found = [];
+   // convert to uppercase to be compatible with what is returned by ...nodeName?
    tagName = tagName.toUpperCase();
 
+   // the "node" provided will usually be document.body, as we'll want to scan an html page
    function explore(node) {
+
+     //console.log(node.childNodes);
+
+     // node.childNodes is a array of all the nodes in the document being scanned
      for (var i = 0; i < node.childNodes.length; i ++) {
        var child = node.childNodes[i];
-       if (child.nodeType == document.ELEMENT_NODE) {
+       // check that is it node Type 1 (document.ELEMENT_NODE):
+       // Also works with nodeType == 1 or document.ELEMENT_NODE.
+       // if (child.nodeType == document.ELEMENT_NODE) {
+       if (child.nodeType == 1) {
+         // check that its nodeName == the name testing for
          if (child.nodeName == tagName) {
            found.push(child);
          }
+         // recusrive to check within each node for their own child nodes (if any)
+         // so this may go several laters deep.
          explore(child);
        }
      }
    }
+
    explore(node);
    return found;
  }
