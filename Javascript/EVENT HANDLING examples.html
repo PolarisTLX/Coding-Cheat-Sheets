@@ -7,9 +7,14 @@
   <body>
 
 
-    <button>Click me</button>
+    <!-- <button>Click me</button>
     <p>Clicking here will do nothing.</p>
-    <button onclick="myClickFunction()">Or Click Me</button>
+    <button onclick="myClickFunction()">Or Click Me</button> -->
+
+    </br>
+    <p>below is the act once button</p>
+    <button>Act-once button</button>
+
 
     <script>
       var button = document.querySelector("button");
@@ -20,6 +25,15 @@
       function myClickFunction() {
         console.log("2nd Button clicked that has with 'onclick' attribute in the HTML.");
       }
+
+      // below demonstrates that "Done." will only print to console once,
+      // then the EventListener will be removed.
+      let buttonR = document.querySelector("button");
+      function once() {
+        console.log("Done.");
+        buttonR.removeEventListener("click", once);
+      }
+      buttonR.addEventListener("click", once);
     </script>
 
 

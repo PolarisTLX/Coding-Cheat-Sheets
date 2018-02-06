@@ -1,6 +1,135 @@
+// yearly variables
+var yearlyDrawTFSA, yearlyDrawRRSP, yearlyDrawNONREG,yearlyTotalDraw, totalYearlyTaxibleIncome, totalYearlyTaxesPaid;
+// final variables based on best scenario calculated
+var finalYearlyDrawTFSA, finalYearlyDrawRRSP, finalYearlyDrawNONREG,finalYearlyTotalDraw, finalTotalYearlyTaxesPaid;
+
+// Store the withdrawal value from each 3 account types for each year?
+// make each year an object, containing a key and value for the 3 account tpes?
+
+var currentAge = 50;
+var assumedAgeExpectancy = 90;
+var lifeYears = assumedAgeExpectancy - currentAge;
+var startingNONREG = 600000;
+var startingRRSP = 400000;
+var startingTFSA = 200000;
+var assumedGainPercent = 8;
 
 
-RRSP withdrawal rules:												
+
+function taxesNONREG(yearlyDrawNONREG) {
+	// 50% of claimed capital gains from non-reg count towards "yearly income" for taxes.
+	totalYearlyTaxibleIncome += yearlyDrawNONREG / 2;
+	// IDEA ADD THIS AMOUNT TO A GLOBAL totalTaxibleIncome?
+}
+
+function taxesRRSP(yearlyDrawRRSP) {
+	// 100% of money from RRSP counts towards yearly income for taxes.
+	totalYearlyTaxibleIncome += yearlyDrawRRSP;
+}
+
+totalYearlyTaxesPaid = function() {
+	// maybe need to do:
+ // the first $42,906 gets taxed at 20%,
+ // any amount above that, up to $46,605, gets taxed at 25$.
+ // on the difference between the two brackets gets taxed at that %.
+
+ // repeat for each amount into the next bracket.
+
+
+	//might be wrong, see idea above instead
+	switch() {
+		case (totalYearlyTaxibleIncome < 42906):
+			taxRate = 20%;
+			break;
+		case (totalYearlyTaxibleIncome < 46605):
+			taxRate = 25%;
+			break;
+		case (totalYearlyTaxibleIncome < 75657):
+			taxRate = 30%;
+			break;
+
+
+
+		$0-$42,906
+		$42,960-$46,605
+		$46,605-$75,657
+		$75,657-$85,923
+		$85,923-$89,131
+		$89,131-$93,208
+		$93,208-$-144,489
+
+	}
+}
+
+
+// loop through iterations of yearlyDrawTFSA, yearlyDrawRRSP, yearlyDrawNONREG,
+// so that combined, all 3 = yearlyTotalDraw.
+// increment in differences of $1,000.
+// assume $50,000 total:
+// Start with all money coming from TFSA,
+// calculate taxes, store values as final
+// then $49,000 from TFSA + $1,000 from NONREG + $0 RRSP
+// then $48,000 TFSA + $2,000 NONREG + $0 RRSP
+// .
+// .
+// .
+// then $0 TFSA + $50,000 NONREG + $0 RRSP
+// .
+// .
+// .
+// then $0 TFSA + $0 NONREG + $50,000 RRSP
+
+//remove total value of taxes that year from the balances (from the Non-reg?)
+//careful of RRSP withholding taxes
+
+// check that no account is at 0.
+// add the assumed % growth rate the what remains in the accounts aftereach year.
+
+// now iterate all over again for each year.
+// calculate total combined taxes for EACH YEAR TOGETHER, if lower then current final, replace those value as new best.
+
+
+
+
+FINAL BEST ANSWER:
+// DO AGAIN FOR EACH YEAR and then a lifetime total
+
+// If the current scenario yields a lower total taxes amount than the previous best (lowest) scenario,
+// then all values from the current scenario replace the "final" values,
+// as they represent the new best scenario (lowest taxes paid)
+if (totalYearlyTaxesPaid < finalTotalYearlyTaxesPaid) {
+	finalYearlyDrawTFSA = yearlyDrawTFSA;
+	finalYearlyDrawRRSP = yearlyDrawRRSP;
+	finalYearlyDrawNONREG = yearlyDrawNONREG;
+	finalYearlyTotalDraw = yearlyTotalDraw;
+	finalTotalYearlyTaxesPaid = totalYearlyTaxesPaid;
+}
+
+
+
+LONG TERM FEATURES TO ADD:
+// graph the yearly withdrawals from each account type into HTML canvas?
+
+//wireframe the UI and the graphs
+
+// run through with constant dollar value, same as initial, showing final dollar value
+//
+
+// diff % return for each account?
+// maybe find trend first, such as find that TFSA best to save for last, so put higher return stocks in that account
+// then run models again but each account type has diff %
+
+// run through so that account is ZERO $0 at death, (or just very low?)
+// what age do you want your spending power to peak? Don't want to spend the most at age 90.
+// want the lowest taxes for the most amount of money spent at optimal age.
+
+
+
+TAX RULES:
+
+Can also see Excel file for same content as below.
+
+RRSP withdrawal rules:
 
 1.  If you take out RRSP money early (before retirement / before 71?) You have to pay witholding taxes
 
