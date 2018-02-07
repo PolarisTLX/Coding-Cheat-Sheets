@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+
+<!-- AWESOME EXAMPLE: this is a event handler applied to parent node to avoid applying to all child nodes -->
+
+<!--
+    <button>A</button>
+    <button>B</button>
+    <button>C</button>
+
+    <script>
+      document.body.addEventListener("click", event => {
+        if (event.target.nodeName == "BUTTON") {
+          console.log("Clicked", event.target.textContent);
+        }
+      });
+    </script> -->
+
+<!-- To target ONLY buttons that are wrapped into a <p>: -->
+<!-- NOW IT WORKS! (but must use with an id attribute and .getElementById ) :)  -->
+<!-- UPDATE: Also got it working as below for buttons within a <p> without needing an id attribute -->
+  <p>
+  <!-- <p id="attempt"> -->
+    <button>A</button>
+    <button>B</button>
+    <button>C</button>
+  </p>
+  <button>NOT INSIDE A PARAGRAPH</buton>
+  <script>
+      // document.p.addEventListener("click", event => {  // DOES NOT WORK
+      // var children = document.body.getElementsByTagName("p");  // DOES NOT WORK
+
+  // var paragraphs = document.getElementById("attempt");  // WORKS!
+  var paragraphs = document.getElementsByTagName("p");  // DOES NOT WORK
+    //console.log(paragraphs);
+    //console.log(paragraphs[0]);
+    // paragraphs.addEventListener("click", event => {  // DOES NOT WORK. Need to add [0]
+    paragraphs[0].addEventListener("click", event => {
+      if (event.target.nodeName == "BUTTON") {
+        console.log("Clicked", event.target.textContent);
+      }
+    });
+  </script>
+
+
+  </body>
+</html>
