@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+
+
+<a href="https://developer.mozilla.org/">Link wont go anywhere</a>
+<button>Normal Button</button>
+<button id="noRightClick">Right Click no menu pops us button</button>
+
+<script>
+let link = document.querySelector("a");
+link.addEventListener("click", event => {
+  console.log("Nope.");
+  event.preventDefault();
+});
+
+let rClick = document.getElementById("noRightClick");
+
+// DOES NOT WORK for PREVENTING RIGHT CLICK:
+// rClick.addEventListener("mousedown", event => {
+//   console.log(event.button);
+//   if (event.button == 2) {
+//     event.preventDefault();
+//   }
+// });
+rClick.addEventListener("contextmenu", event => {
+  if (event.button == 2) {
+    event.preventDefault();
+  }
+});
+</script>
+
+</body>
+</html>

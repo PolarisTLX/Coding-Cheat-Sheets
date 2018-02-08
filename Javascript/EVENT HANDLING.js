@@ -152,3 +152,329 @@ that handler also calls .stopPropagation() and thus something happens ONLY to th
       if (event.button == 2) { event.stopPropagation(); }
     });
   </script>
+
+
+  CONTINUE FROM COFFEE & CODE
+
+  Most event objects also have a .target property.
+  It refers to the node where they originated.
+  You can use this to protect against handling an event that propogated up from a node you did not intend.
+
+  You can also use the .target property to use a wide net to catch an event where there are many child nodes within 1 parent node.
+
+  AWESOME EXAMPLE!!!!
+  Example: a parent node contains many buttons as child nodes,
+  and its simpler to just place a click handler on the parent node,
+  and use the .target property to figure out if any of the child buttons were clicked,
+  as opposed to placing a handler on each of the child button nodes.
+
+  <!-- AWESOME EXAMPLE: this is a event handler applied to parent node to avoid applying to all child nodes -->
+
+  <!--
+      <button>A</button>
+      <button>B</button>
+      <button>C</button>
+
+      <script>
+        document.body.addEventListener("click", event => {
+          if (event.target.nodeName == "BUTTON") {
+            console.log("Clicked", event.target.textContent);
+          }
+        });
+      </script> -->
+
+   <!-- BETTER EXAMPLE -->
+  <!-- To target ONLY buttons that are wrapped into a <p>: -->
+  <!-- NOW IT WORKS! (but must use with an id attribute and .getElementById ) :)  -->
+  <!-- UPDATE: Also got it working as below for buttons within a <p> without needing an id attribute -->
+    <p>
+   <!-- <p id="attempt"> -->
+      <button>A</button>
+      <button>B</button>
+      <button>C</button>
+    </p>
+    <button>NOT INSIDE A PARAGRAPH</buton>
+    <script>
+        // document.p.addEventListener("click", event => {  // DOES NOT WORK
+        // var children = document.body.getElementsByTagName("p");  // DOES NOT WORK
+
+    // var paragraphs = document.getElementById("attempt");  // WORKS!
+    var paragraphs = document.getElementsByTagName("p");  // DOES NOT WORK
+      //console.log(paragraphs);
+      //console.log(paragraphs[0]);
+      // paragraphs.addEventListener("click", event => {  // DOES NOT WORK. Need to add [0]
+      paragraphs[0].addEventListener("click", event => {
+        if (event.target.nodeName == "BUTTON") {
+          console.log("Clicked", event.target.textContent);
+        }
+      });
+    </script>
+
+
+  REVIEW:  document.body holds all of the nodes.
+  document.p  does not work.
+
+  // DONE AT COFFEE & CODE
+
+
+
+DEFAULT ACTIONS
+Most events have default actions: click link takes you to that page,
+Press down arrow, the webpage scrolls down etc.
+
+JavaScript event handlers that you apply will occur BEFORE the default behavior.
+(though not all types of events)
+If you want then prevent the default from happening,
+use .preventDefault()  method on the event.
+
+Example: A link that wont go anywhere:
+
+    <a href="https://developer.mozilla.org/">Link wont go anywhere</a>
+
+    <script>
+    let link = document.querySelector("a");
+    link.addEventListener("click", event => {
+      console.log("Nope.");
+      event.prevent();
+    });
+    </script>
+
+
+Example: To prevent a button from have the right click on it,
+requires the "contextmenu" event type:
+
+    <button>Normal Button</button>
+    <button id="noRightClick">Right Click no menu pops us button</button>
+
+    <script>
+        let rClick = document.getElementById("noRightClick");
+
+        // DOES NOT WORK for PREVENTING RIGHT CLICK:
+        // rClick.addEventListener("mousedown", event => {
+        //   if (event.button == 2) {
+        //     event.preventDefault();
+        //   }
+        // });
+
+        rClick.addEventListener("contextmenu", event => {
+          if (event.button == 2) {
+            event.preventDefault();
+          }
+        });
+    </script>
+
+Some events in some browsers cannot be intercepted like this,
+example in Chrome, you cannot intercept Ctrl+W to close the current tab with JS.
+
+
+
+KEY EVENTS
+
+Example with keydown and keyup events.
+
+    <p>This page turns violet when you hold down the V key</p>
+    <script>
+    addEventListener("keydown", event => {
+      if (event.key == "v") {
+        document.body.style.background = "violet";
+      }
+    });
+    addEventListener("keyup", event => {
+      if (event.key == "v") {
+        document.body.style.background = "";
+      }
+    });
+    </script>
+
+
+Note that a keydown event repeats if it is held down.
+Have to be careful of this.
+
+SPECIAL NOTE: If you hold Shift while pressing a key, it changes its value as you might expect:
+For the event.key == "v"
+v = "v",  Shift + v = "V"  3 = "3", Shift + 3 = "#".
+
+You can see if the special keys are being held down
+by looking at the properties of: shiftKey, ctrlKey, altKey, metaKey
+
+    <p>Press Contrl-Space</p>
+    <script>
+        addEventListener("keydown", event => {
+          // both keys need to be pressed:
+          if (event.key == " " && event.ctrlKey) {
+            console.log("Both keys are being pressed. Good!");
+          }
+        });
+    </script>
+
+
+WHICH ELEMENT CURRENTLY HAS THE FOCUS IS WHERE A KEY EVENT ORIGINATES
+Elements like form fiels, links, buttons can be what is currently "focused" on a page.
+Normal nodes cannot have focus (though apparenly can if a "tabindex" attribute is given).
+When nothing is in particular focus, document.body acts as the target node of key events.
+
+Issue/problems: it is complicated to observe what a user is typing,
+this can be due to things like:
+-using a virtual keyboard on android, which does not fire any key events
+-special software such as IME where multiple keystrokes are used to create special characters.
+
+The best way is to check in elements that can be typed into,
+such as <input> and <textarea> elements,
+these elements fire "input" events instead of "key" events whenever a user changes the content (type something),
+More in Chapter 18 (HTTP and Forms).
+
+
+
+POINTER EVENTS:
+
+Mouse Clicks and Touchscreens produce different kinds of events.
+
+"mousedown" and "mouseup" events happen on the DOM nodes/elements that are immediately below the mouse pointer.
+a "click" event fires AFTER a "mouseup" event.
+NOTE If occurs on the event the contained both the "mousedown" & "mouseup" events (the pointer did not move during clicking).
+If you click on paragraph, and hold, then move (drag) to another paragraph,
+the "click" event will occur on the element that contains both those paragraphs.
+
+There is also a "dblclick" event.
+
+
+MOUSE "pageX" AND "pageY" || "clientX" AND "clientY":
+
+Coordinates / precise information on location of a click,
+you can look at the properties of "pageX" and "pageY",
+which are coordinates in pixels of the top-left corner of the whole document
+OR
+"clientX" and "clientY", for coordinates of the top-left corner of the current window (if zoomed in or scrolled).
+
+VERY SIMPLE DRAWING PROGRAM EXAMPLE:
+
+It creates <div> after each click into the document.body:
+and adds the class "dotCSS" that we define in the <style> section.
+Ex: <div class="dotCSS" style="left: 635px; top: 45px;"></div>
+
+    <style>
+      body {
+        height: 200px;
+        background: beige;
+      }
+      .dotCSS {
+        height: 8px; width: 8px;
+        border-radius: 4px; /* rounds corners */
+        background: blue;
+        position: absolute;
+      }
+    </style>
+
+    <script>
+      addEventListener("click", event => {
+        let dot = document.createElement("div");
+        dot.className = "dotCSS";
+        dot.style.left = (event.pageX - 4) + "px";
+        dot.style.top = (event.pageY - 4) + "px";
+        document.body.appendChild(dot);
+      });
+    </script>
+
+
+MOUSE MOTION
+
+Everytime the mouse moves, a "mousemove" event is fired.
+You be used to track the postion of the mouse,
+Can be very useful for click & drag functionality.
+
+Example that makes a visual bar become wider or narrower
+by dragging the mouse to left or right.
+
+    <p>Drag the bar to change its width:</p>
+    <div style="background: orange; width: 60px; height: 20px"></div>
+    <script>
+        let lastX; // last observed mouse X-position
+        let rect = document.querySelector("div");
+        rect.addEventListener("mousedown", event => {
+          if (event.button == 0) {
+            lastX = event.clientX;
+            addEventListener("mousemove", moved);
+            event.preventDefault(); //prevent selecting/highlighting the element, which is default action
+          }
+        });
+
+        function moved(event) {
+          // When NO buttons are being pressed, stop changing the element:
+          if (event.buttons == 0) {
+            // this S MUST be used as its the property that tells us which buttons are being held down
+            // this S MUST be used as its the property that tells us HOW MANY buttons are being held down
+            // If mouse button 1 and 2 are being held down, then event.buttons = 3
+            removeEventListener("mousemove", moved);
+          } else {
+            let dist = event.clientX - lastX;
+            let newWidth = Math.max(10, rect.offsetWidth + dist);
+            rect.style.width = newWidth + "px";
+            lastX = event.clientX;
+          }
+        }
+    </script>
+
+
+SPECIAL NOTE: event.buttons  with an S  is a special property for the number of mouse buttons currently held down.
+And it works in this way. If mouse button 1 and button 2 (left and right click) are held down together, event.buttons = 3 (1+2).
+CAREFUL The numerical values of the mouse buttons in event.buttons are not the same as those for event.button.
+
+
+
+TOUCH EVENTS
+
+Touch events were added after in a non-robust way after most browsers had been designed purely for mouse cursors.
+"mousedown", "mouseup" and "click" events are mimiced with touch,
+but not "mousemove".
+The resizable bar in the last example will not work on a touch screen.
+Simple buttons will work as a basic "mousedown" event is mimiced when touched on a touchscreen.
+
+Other events are creates specifically for touch:
+"touchstart" for when a fingers starts touching a screen,
+"touchmove" for when the finger moves on the screen.
+"touchend" for when the finger is removed from the screen.
+
+because of "multi-touch" screens with multiple fingers at once on the screen, unlike a single mouse cursor,
+these events dont have a single set of coordinates.
+Their event objects instead have a property ".touches"
+it holds an array-like object of points,
+each point has its own pageX, pageY, clientX, clientY
+
+Example to show red circles for every touching finger:
+
+    <style>
+      dot { position: absolute; display: block;
+            border: 2px solid red; border-radius: 50px;
+            height: 100px; width: 100px; }
+    </style>
+    <p>Touch this page</p>
+    <script>
+      // to make the dot follow the fingers,
+      // they must be constantly removed from their last location
+      // so the "update" function below is called after every event
+      function update(event) {
+        for (let dot; dot = document.querySelector("dot");) {
+          dot.remove();
+        }
+        for (let i = 0; i < event.touches.length; i++) {
+        // event.touches.length is every finger on the screen
+          let {pageX, pageY} = event.touches[i];
+          let dot = document.createElement("dot");
+          dot.style.left = (pageX - 50) + "px";
+          dot.style.top = (pageY - 50) + "px";
+          document.body.appendChild(dot);
+        }
+      }
+      addEventListener("touchstart", update);
+      addEventListener("touchmove", update);
+      addEventListener("touchend", update);
+    </script>
+
+
+Usually youll want to use .preventDefault() for touch events,
+to prevent browsers default behavior that often come up,
+such as scrolling the page on swipe and mouse events like clicks from firing.
+
+
+
+SCROLL EVENTS

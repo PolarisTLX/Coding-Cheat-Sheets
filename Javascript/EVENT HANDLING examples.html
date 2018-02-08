@@ -37,5 +37,35 @@
     </script>
 
 
+    <!-- keyodwn / keyup example: -->
+
+    <p>This page turns violet when you hold down the V key</p>
+    <script>
+    addEventListener("keydown", event => {
+      if (event.key == "v") {
+        document.body.style.background = "violet";
+      }
+    });
+    addEventListener("keyup", event => {
+      if (event.key == "v") {
+        document.body.style.background = "";
+      }
+    });
+    </script>
+
+
+    <!-- Ctrl and other special keys example -->
+
+    <p>Press Ctrl-Space</p>
+    <script>
+    addEventListener("keydown", event => {
+      // both keys need to be pressed:
+      if (event.key == " " && event.ctrlKey) {
+        console.log("Both keys are being pressed. Good!");
+      }
+    });
+    </script>
+
+
   </body>
 </html>

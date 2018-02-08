@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <p>Drag the bar to change its width:</p>
+    <div style="background: orange; width: 60px; height: 20px"></div>
+    <script>
+        let lastX; // last observed mouse X-position
+        let rect = document.querySelector("div");
+        rect.addEventListener("mousedown", event => {
+          if (event.button == 0) {
+            lastX = event.clientX;
+            addEventListener("mousemove", moved);
+            event.preventDefault(); //prevent selecting/highlighting the element, which is default action
+          }
+        });
+
+        function moved(event) {
+          if (event.buttons == 0) {  //CHECK THE S HERE!!!
+            // this S MUST be used as its the property that tells us HOW MANY buttons are being held down
+            // If mouse button 1 and 2 are being held down, then event.buttons = 3
+            removeEventListener("mousemove", moved);
+          } else {
+            let dist = event.clientX - lastX;
+            let newWidth = Math.max(10, rect.offsetWidth + dist);
+            rect.style.width = newWidth + "px";
+            lastX = event.clientX;
+          }
+        }
+    </script>
+
+  </body>
+</html>

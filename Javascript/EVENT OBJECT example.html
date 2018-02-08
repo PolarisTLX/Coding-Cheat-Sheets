@@ -184,12 +184,12 @@ as opposed to placing a handler on each of the child button nodes.
       });
     </script> -->
 
-//BETTER EXAMPLE
-// To target ONLY buttons that are wrapped into a <p>: -->
-// NOW IT WORKS! (but must use with an id attribute and .getElementById ) :)  -->
-// UPDATE: Also got it working as below for buttons within a <p> without needing an id attribute -->
+ <!-- BETTER EXAMPLE -->
+<!-- To target ONLY buttons that are wrapped into a <p>: -->
+<!-- NOW IT WORKS! (but must use with an id attribute and .getElementById ) :)  -->
+<!-- UPDATE: Also got it working as below for buttons within a <p> without needing an id attribute -->
   <p>
-// <p id="attempt"> -->
+ <!-- <p id="attempt"> -->
     <button>A</button>
     <button>B</button>
     <button>C</button>
@@ -211,8 +211,29 @@ as opposed to placing a handler on each of the child button nodes.
     });
   </script>
 
+  <!-- keyodwn / keyup example: -->
 
-REVIEW:  document.body holds all of the nodes.
-docuemnt.p  does not work.
+  <p>This page turns violet when you hold down the V key</p>
+  <script>
+  addEventListener("keydown", event => {
+    if (event.key == "v") {
+      document.body.style.background = "violet";
+    }
+  });
+  addEventListener("keyup", event => {
+    if (event.key == "v") {
+      document.body.style.background = "";
+    }
+  });
+  </script>
 
-// DONE AT COFFEE & CODE
+
+
+
+<!-- REVIEW:  document.body holds all of the nodes.
+document.p  does not work.
+
+// DONE AT COFFEE & CODE -->
+
+
+SOMETHING WRONG WTH THE CONTENT IN THIS FILE, DUPLICATE?

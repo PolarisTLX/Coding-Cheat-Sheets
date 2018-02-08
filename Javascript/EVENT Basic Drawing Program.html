@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+
+<!-- It creates <div> after each click into the document.body:
+and adds the class "dotCSS" that we define in the <style> section.
+Ex: <div class="dotCSS" style="left: 635px; top: 45px;"></div> -->
+
+
+    <style>
+      body {
+        height: 200px;
+        background: beige;
+      }
+      .dotCSS {
+        height: 8px; width: 8px;
+        border-radius: 4px; /* rounds corners */
+        background: blue;
+        position: absolute;
+      }
+    </style>
+
+    <script>
+      addEventListener("click", event => {
+        let dot = document.createElement("div");
+        dot.className = "dotCSS";
+        dot.style.left = (event.pageX - 4) + "px";
+        dot.style.top = (event.pageY - 4) + "px";
+        document.body.appendChild(dot);
+      });
+    </script>
+
+  </body>
+</html>

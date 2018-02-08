@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+<!-- NEED TO TEST ON DEVICE!!!  -->
+
+    <style>
+      dot { position: absolute; display: block;
+            border: 2px solid red; border-radius: 50px;
+            height: 100px; width: 100px; }
+    </style>
+    <p>Touch this page</p>
+    <script>
+      function update(event) {
+        for (let dot; dot = document.querySelector("dot");) {
+          dot.remove();
+        }
+        for (let i = 0; i < event.touches.length; i++) {
+          let {pageX, pageY} = event.touches[i];
+          let dot = document.createElement("dot");
+          dot.style.left = (pageX - 50) + "px";
+          dot.style.top = (pageY - 50) + "px";
+          document.body.appendChild(dot);
+        }
+      }
+      addEventListener("touchstart", update);
+      addEventListener("touchmove", update);
+      addEventListener("touchend", update);
+    </script>
+
+  </body>
+</html>
