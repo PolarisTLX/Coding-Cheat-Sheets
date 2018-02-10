@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <style>
+      #progress {
+        border-bottom: 2px solid blue;
+        width: 0;
+        position: fixed;  // this prevents the object from scrolling with the page
+        top: 0; left: 0;
+      }
+    </style>
+
+    <div id="progress"></div>
+    <script>
+      document.body.appendChild(document.createTextNode(
+        "this is random content to make a long page".repeat(1000)));
+
+      let bar = document.querySelector("#progress");
+      addEventListener("scroll", () => {
+        let max = document.body.scrollHeight - innerHeight;
+        // innerHeight (the height of the window), is required to not scroll passed the bottom of the document
+        bar.style.width = `${(pageYOffset / max) * 100}%`;
+        // % is used instead of "px" so that the element is sized relative to the page width.
+      });
+    </script>
+
+  </body>
+</html>

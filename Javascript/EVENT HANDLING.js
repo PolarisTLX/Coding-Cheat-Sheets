@@ -478,3 +478,104 @@ such as scrolling the page on swipe and mouse events like clicks from firing.
 
 
 SCROLL EVENTS
+
+"scroll" event is fired naturally after an element is scrolled.
+This is useful for keeping track of where a user is on a page,
+or trigger animations only at certain points in a page.
+Can only have various ways of showing progress like highlighting points in the navbar
+
+Example: a progress bar is drawn at top of page as a user scrolls down.
+
+<style>
+  #progress {
+    border-bottom: 2px solid blue;
+    width: 0;
+    position: fixed;  // this prevents the object from scrolling with the page
+    top: 0; left: 0;
+  }
+</style>
+
+<div id="progress"></div>
+<script>
+  document.body.appendChild(document.createTextNode(
+    "this is random content to make a long page".repeat(1000)));
+
+  let bar = document.querySelector("#progress");
+  addEventListener("scroll", () => {
+    let max = document.body.scrollHeight - innerHeight;
+    // innerHeight (the height of the window), is required to not scroll passed the bottom of the document
+    bar.style.width = `${(pageYOffset / max) * 100}%`;
+    // % is used instead of "px" so that the element is sized relative to the page width.
+  });
+</script>
+
+
+position: fixed;  prevents the object from scrolling with the page
+
+
+FOCUS EVENTS
+
+The browser files a "focus" event on any element that gains focus,
+(clicked on, like a text field)
+and a "blur" event when they lose focus.
+
+These two events DO NOT propogate up unlike most other events.
+An event handler on a parent node is not notified when a child node gains or loses focus.
+
+Example: help appears on any text field that is in focus:
+
+<p>Name: <input type="text" data-help="Your full name"></p>
+<p>Age: <input type="text" data-help="Age in years"></p>
+<p id="help"></p>
+
+<script>
+let help = document.querySelector('#help');
+// the last <p> tag
+let fields = document.querySelectorAll("input");
+// the 2 input fields
+
+for (let field of Array.from(fields)) {
+  // add the help text when clicked in focus:
+  field.addEventListener("focus", event => {
+    // each input field (the ".target") has their own "data-help" attribute text:
+    let text = event.target.getAttribute("data-help");
+    // place that content in the last <p> tag.
+    help.textContent = text;
+  });
+  // remove the help text when click out of focus:
+  field.addEventListener("blur", event => {
+    help.textContent = "";
+  });
+}
+</script>
+
+SPECIAL NOTE: moving from or to the browser tabs or window will affect the "focus" and "blur" events
+
+
+
+LOAD EVENTS
+
+A "load" event is fired when a page has finished loading.
+If fires on the window and the document body objects.
+
+This can be helpful to delay content of <script> tags,
+because <script> tags run immediately when encountered, even if the page has not finished loading.
+
+Some elements, such as images and script tags that load an external file
+also have a "load" event that indicates the files there reference have finished loading.
+
+Like "focus" events, "load" events also do NOT propagate.
+
+When a page is closed or the user navigated away,
+a "beforeunload" event fires.
+This event is to be able to allow a user to save any unsaved work.
+
+You can make a prompt appear to ask the user if they are sure they want to leave the page.
+this is done by returning a non-null value from the handler.
+"preventDefault" cannot be used here, so that a coder cannot maliciously force a user to stay on a page.
+
+
+THE EVENT LOOP
+
+This ties into Asyncronous Programming, which is a new chapter from the 3rd edition of the book.
+But this chapter was placed early in the book, so need to go back and revisit.

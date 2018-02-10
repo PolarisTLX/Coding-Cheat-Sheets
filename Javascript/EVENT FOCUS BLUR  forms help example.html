@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <p>Name: <input type="text" data-help="Your full name"></p>
+    <p>Age: <input type="text" data-help="Age in years"></p>
+    <p id="help"></p>
+
+    <script>
+    let help = document.querySelector('#help');
+    // the last <p> tag
+    let fields = document.querySelectorAll("input");
+    // the 2 input fields
+
+    for (let field of Array.from(fields)) {
+      // add the help text when clicked in focus:
+      field.addEventListener("focus", event => {
+        // each input field (the ".target") has their own "data-help" attribute text:
+        let text = event.target.getAttribute("data-help");
+        // place that content in the last <p> tag.
+        help.textContent = text;
+      });
+      // remove the help text when click out of focus:
+      field.addEventListener("blur", event => {
+        help.textContent = "";
+      });
+    }
+    </script>
+
+  </body>
+</html>
