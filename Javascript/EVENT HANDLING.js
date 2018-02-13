@@ -579,3 +579,7 @@ THE EVENT LOOP
 
 This ties into Asyncronous Programming, which is a new chapter from the 3rd edition of the book.
 But this chapter was placed early in the book, so need to go back and revisit.
+
+event handlers are scheduled when the event occurs,
+but they must wait for other scripts that are running to finish before they get a chance to run.
+They are similar to notifications of other asynchronous events.
