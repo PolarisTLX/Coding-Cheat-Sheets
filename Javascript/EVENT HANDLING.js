@@ -583,3 +583,36 @@ But this chapter was placed early in the book, so need to go back and revisit.
 event handlers are scheduled when the event occurs,
 but they must wait for other scripts that are running to finish before they get a chance to run.
 They are similar to notifications of other asynchronous events.
+
+The webpage can become slow and unresponsive if you schedule long running event handlers,
+or many short running event handlers that fire very often.
+
+If you REALLY want to do some time consuming thing in the background without slowing/freezing the page.
+browsers provide WEB WORKERS.
+This is a javascript process that runs alongside the main script, but on its own timeline.
+WORKERS do not share their global scope or any other data with the main script,
+this is to avoid problems of having multiple threads.
+You have to communicate with WORKERS by sending messages back and forth.
+
+The code below spawns a worker that uses a script "postMessage", sends it a few messages, and outputs the responses:
+
+The script that would be saved in a file called "code/squareworker.js":
+
+    addEventListener("message", event => {
+      postMessage(event.data * event.data);
+    });
+
+The code that uses the script from file "code/squareworker.js":
+
+    let squareWorker = new Worker("code/squareworker.js");
+    // NOTE the use of "new Worker", "Worker" being a built in object.
+
+    squareWorker.addEventListener("message", event => {
+      console.log("The worker responded:". event.data);
+    });
+
+    squareWorker.postMessage(10);
+    squareWorker.postMessage(24);
+
+The postMessage functin sends a message, which causes a event "message" to fire in the receiver.
+The script that created the worker sends and receives messages through the "Worker" object.
