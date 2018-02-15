@@ -616,3 +616,5 @@ The code that uses the script from file "code/squareworker.js":
 
 The postMessage functin sends a message, which causes a event "message" to fire in the receiver.
 The script that created the worker sends and receives messages through the "Worker" object.
+
+TIMERS
