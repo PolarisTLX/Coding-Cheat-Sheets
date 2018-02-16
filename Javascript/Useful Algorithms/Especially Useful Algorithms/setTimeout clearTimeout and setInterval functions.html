@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <p>Different examples of setTimeout() function.</p>
+    <p>This page changes color after 2000 miliseconds.</p>
+    <p>In the console there is also function that posts after 1000 ms. But a 50% chance of being cleared/cancelled was applied to it.</p>
+    <p>The console also uses an example of setInterval() and clearInterval() which are similar.</p>
+
+    <script>
+        // Example to change the screen from blue to yellow after 2 seconds:
+        document.body.style.background = "purple";
+        setTimeout(() => {
+          document.body.style.background = "yellow";
+        }, 2000);
+
+
+        // Example to cancel a setTimeout() function:
+        let bombTimer = setTimeout(() => {
+          console.log("BOOM!");
+        }, 1000);
+
+        // random way to decide if you want to cancel a setTimeout():
+        if (Math.random() < 0.5) { //50% chance
+            clearTimeout(bombTimer);
+            console.log("setTimout() function defused and cancelled.");
+        }
+
+        //EXAMPLE with setInterval() and clearInterval() that is similar:
+        let ticks = 0;
+        let clock = setInterval(() => {
+          console.log("tick", ticks++);
+          if (ticks == 10) {
+            clearInterval(clock);
+            console.log("stop.");
+          }
+        }, 200);
+
+    </script>
+
+  </body>
+</html>

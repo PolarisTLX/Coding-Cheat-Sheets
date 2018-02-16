@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <!-- DEBOUNCING - prevent an event from firing too often:
+
+    For some kind of events that fire very quicklty and fire often,
+    such as "mousemove" and "scroll" events,
+    you do NOT want to add anything very time consuming / intensive to a handler on one of these events.
+    It will make the page feel dramatically choppier.
+
+    If you do need to, use setTimeout to make sure you are not doing it too often.
+    this is called DEBOUNCING THE EVENT.
+
+    Several approaches to this:
+
+    Example 1: want code to react to user typing something,
+    but dont want to react immediately for every input event.
+    when they are typing quickly, we just want to wait for a pause to uccur.
+    Thus we use setTimeout().
+    We also clear any previous timeout.
+    This cancels any previous timeout that didnt have time to uccur,
+    like if a pause is not long enough and the user starts typing again. -->
+
+    <!-- Possible use: start running a search before user has finished typing everything, but not on every letter/every millisecond -->
+
+        <textarea>Type something here...</textarea>
+        <script>
+            let textarea = document.querySelector("textarea");
+            let timeout;
+            textarea.addEventListener("input", () => {
+              clearTimeout(timeout);
+              timeout = setTimeout(() => console.log("Textarea value currently: " + textarea.value), 500)
+            });
+        </script>
+
+        <script>
+          let scheduled = null;
+          addEventListener("mousemove", event => {
+            if (!scheduled) {
+              setTimeout(() => {
+                // BELOW REPLACES ALL TEXT ON THE PAGE, SO CHANGED TO JUST BE LOGGED IN CONSOLE
+                // document.body.textContent =
+                  // `Mouse at ${scheduled.pageX}, ${scheduled.pageY}`;
+                  console.log(`Mouse at ${scheduled.pageX}, ${scheduled.pageY}`);
+                scheduled = null;
+              }, 250);
+            }
+            scheduled = event;
+          });
+        </script>
+
+  </body>
+</html>

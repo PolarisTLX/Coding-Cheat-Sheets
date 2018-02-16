@@ -1,6 +1,12 @@
 Chapter 14 of Eloquent JavaScript: Handling Events
 
 
+SPECIAL SUMMARY NOTE:
+Only one piece of JavaScript program can run at a time.
+Thus, event handlers and other scheduled scripts
+have to wait until other scripts finish before they get their turn.
+
+
 The addEventListener("event", function(){})  functin registers its second argument (usually a functin),
 to be called when the event in the first argument occurs.
 It is called as a method on the whole browser window.
@@ -618,3 +624,143 @@ The postMessage functin sends a message, which causes a event "message" to fire 
 The script that created the worker sends and receives messages through the "Worker" object.
 
 TIMERS
+
+Looking at the setTimeout() functin again.
+It schedules another functin to be called after a chosen amount of milliseconds have passed (once it has beeen called).
+
+Example: page turns from blue to yellow after 2 seconds:
+
+    <script>
+        document.body.style.background = "blue";
+        setTimeout(() => {
+          document.body.style.background = "yellow";
+        }, 2000);
+    </script>
+
+
+CANCELLING A SCHEDULED setTimeout() with clearTimeout():
+
+You cancel a scheduled event by storing the value returned by setTimeout(),
+and calling "clearTimeout()" on it.
+
+Example with a random way to decide if you want to cancel a setTimeout():
+
+    let bombTimer = setTimeout(() => {
+      console.log("BOOM!");
+    }, 500);
+
+    // random way to decide if you want to cancel a setTimeout():
+    if (Math.random() < 0.5) { //50% chance
+        clearTimeout(bombTimer);
+        console.log("setTimout() function defused and cancelled.");
+    }
+
+
+NOTE: There is no issue if you give clearTimeout an undefined value
+or call it on a timeout that has already fired. So no concern using it.
+
+CANCELLING AN INTERVAL with setInterval() and clearInterval():
+very similar to above.
+setInterval is used to repeat an action every x miliseconds.
+
+Example:
+
+let ticks = 0;
+let clock = setInterval(() => {
+  console.log("tick", ticks++);
+  if (ticks == 10) {
+    clearInterval(clock);
+    console.log("stop.");
+  }
+}, 200);
+
+ANIMATIONS: IGNORE / DONT SHOW CERTAIN ANIMATION FRAMES?
+The cancelAnimationFrame() funtin works the same way as clearTimeout().
+calling it on a value returned by requestAnimationFrame() will cancel that frame
+(if it occurs before that frame/the frame hasnt already occured).
+
+
+
+DEBOUNCING - prevent an event from firing too often:
+
+For some kind of events that fire very quicklty and fire often,
+such as "mousemove" and "scroll" events,
+you do NOT want to add anything very time consuming / intensive to a handler on one of these events.
+It will make the page feel dramatically choppier.
+
+If you do need to, use setTimeout to make sure you are not doing it too often.
+this is called DEBOUNCING THE EVENT.
+
+Several approaches to this:
+
+Example 1: want code to react to user typing something,
+but dont want to react immediately for every input event.
+when they are typing quickly, we just want to wait for a pause to uccur.
+Thus we use setTimeout().
+We also clear any previous timeout.
+This cancels any previous timeout that didnt have time to uccur,
+like if a pause is not long enough and the user starts typing again.
+
+Possible use: start running a search before user has finished typing everything, but not on every letter/every millisecond
+
+    <textarea>Type something here...</textarea>
+    <script>
+        let textarea = document.querySelector("textarea");
+        let timeout;
+        textarea.addEventListener("input", () => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => console.log("Textarea value currently: " + textarea.value), 500)
+        });
+    </script>
+
+
+Example 2: want to space actions/responses by at least a certain length of time.
+But you want it to fire DURING a specific kind of event and not just afterwards.
+Such as during "mousemove", want to keep track of co-ordinates,
+but not every single milisecond.
+
+    <script>
+      let scheduled = null;
+      addEventListener("mousemove", event => {
+        if (!scheduled) {
+          setTimeout(() => {
+            // BELOW REPLACES ALL TEXT ON THE PAGE, SO CHANGED TO JUST BE LOGGED IN CONSOLE
+            // document.body.textContent =
+              // `Mouse at ${scheduled.pageX}, ${scheduled.pageY}`;
+              console.log(`Mouse at ${scheduled.pageX}, ${scheduled.pageY}`);
+            scheduled = null;
+          }, 250);
+        }
+        scheduled = event;
+      });
+    </script>
+
+
+SPECIAL SUMMARY NOTE:
+Only one piece of JavaScript program can run at a time.
+Thus, event handlers and other scheduled scripts
+have to wait until other scripts finish before they get their turn.
+
+
+
+EXERCISES:
+
+BALLOON
+
+Make site with a balloon emoji.
+When you press the up arrow, the balloon increases in size by 10%,
+and down arrow it will do the reverse.
+The arrow keys are "ArrowUp" and "ArrowDown".
+Do this wil the CSS property style.fontSize.
+
+Make sure to onlyadjust the balloon, and not cause the page to scroll.
+stop default?
+
+EXTRA:  Balloon blows up when past a certain point.
+Replace the emoji, then remove event handler.
+
+
+<p>🎈</p>
+
+<script>
+</script>
