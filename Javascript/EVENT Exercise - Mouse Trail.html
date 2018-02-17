@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <div class="trail"></div>
+    <div class="trail"></div>
+    <div class="trail"></div>
+    <div class="trail"></div>
+    <div class="trail"></div>
+    <div class="trail"></div>
+    <div class="trail"></div>
+    <div class="trail"></div>
+
+    <style>
+      .trail { /* className for the trail elements */
+        position: absolute;
+        height: 6px; width: 6px;
+        border-radius: 3px;
+        background: teal;
+        visibility: hidden; /*make invisible to start*/
+      }
+      body {
+        height: 300px;
+      }
+    </style>
+
+    <script>
+
+    let allDivs = document.getElementsByTagName("div");
+    //NOTE this is an array-like object!
+    // console.log(allDivs);
+
+    let nextDiv = 0;
+    // console.log(allDivs[nextDiv]);
+
+    addEventListener("mousemove", event => {
+
+      allDivs[nextDiv].style.left = event.pageX + "px"; //mouse X coord
+      allDivs[nextDiv].style.top = event.pageY + "px"; //mouse Y coord
+
+      // make the .trail class visible now that mose has moved:
+
+      // THIS DOES NOT WORK ON THE CSS CLASS ITSELF, BUT ON EACH ELEMENT:
+      //document.getElementsByClassName("trail").style.visibility = "visible";
+      document.getElementsByTagName("div")[nextDiv].style.visibility = "visible";
+      // REMEMBER IT IS AN array-like object.
+
+
+      nextDiv++;
+      console.log(nextDiv);
+
+      // don't go past number of div elements:
+      // console.log(allDivs.length);
+      if (nextDiv > allDivs.length-1) {
+        nextDiv = 0;
+      }
+
+    });
+
+    </script>
+
+  </body>
+</html>

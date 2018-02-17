@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <div id="wrapper">
+      <div data-tabname="one">Tab one</div>
+      <div data-tabname="two">Tab two</div>
+      <div data-tabname="three">Tab three</div>
+    </div>
+
+    <script>
+      function asTabs(node) {
+         /* first make an array, a var called "tabs" of all the tabs.
+          this is done by getting all the child nodes (the tabs),
+          that are inside the div "wrapper" that is a parent to them all.
+          NOTE "node" in this function is the argument,
+          so we call this function with id the parent.wrapping div */
+          // node.childNodes will be an array-like object
+          // So use The Array.from() method, as it creates a new Array from an array-like object.
+        let tabs = Array.from(node.childNodes)
+
+          // only want the element nodes, not the whitespace textnodes between them.
+          // so filter for nodeType == 1
+          .filter(n => n.nodeType == 1)
+
+          // now to create buttons in each one:
+          .map(node => {
+            let button = document.createElement("button");
+
+            // with the text within them:
+            button.textContent = node.getAttribute("data-tabname");
+
+            // this I dont entirely get:
+            let tab = {node, button};
+            // add event listener to each button,
+            // that event will be click and call another function called "selectTab"
+            button.addEventListener("click", () => selectTab(tab));
+            return tab;
+          });
+
+          // don't entirely get this:
+          let tabList = document.createElement("div");
+          // "tabs" is the array of all the tabs breated in beginning
+          for (let {button} of tabs) {
+            tabList.appendChild(button);
+          }
+          node.insertBefore(tabList, node.firstChild);
+
+          // this function is set to fire when a button is clicked:
+          function selectTab(selectedTab) {
+            // "tabs" is the array of all the tabs breated in beginning
+            for (let tab of tabs) {
+              // wuuuuuuut????
+              let selected = tab == selectedTab;
+
+              // only the node of the selected tab will be displayed:
+              tab.node.style.display = selected ? "" : "none";
+              // if selected is true, display is blank (so it displays)
+              // if selected is not true, display is "none" (so it is hidden)
+
+              // only button of selected tab will be red:
+              tab.button.style.color = selected ? "red" : "";
+            }
+          }
+          // call this right away so that only the first tab is shown
+          // if this is not here, initially all content will be shown at once.
+          selectTab(tabs[0]);
+      }
+
+      asTabs(document.querySelector("#wrapper"));
+    </script>
+
+  </body>
+</html>

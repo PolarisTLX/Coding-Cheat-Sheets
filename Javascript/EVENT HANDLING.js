@@ -760,7 +760,143 @@ EXTRA:  Balloon blows up when past a certain point.
 Replace the emoji, then remove event handler.
 
 
-<p>🎈</p>
+  <p>🎈</p>
+
+  <script>
+      // IMPORTANT NOTE:  getElementsByTagName("p") is array-like, must select [0] to address it
+      let balloon = document.getElementsByTagName("p")[0];
+      let balloonSize = 16; //what ever is standard to start
+
+      // addEventListener("keyup", event => {
+      // to remove add event listener required naming the function (not anonymous function)
+      addEventListener("keyup", keyUpFunction);
+
+      function keyUpFunction(e) {
+        if (event.key == "ArrowUp") {
+          //stop from scrolling:
+          event.preventDefault();
+
+          balloonSize += 10;
+          balloon.style.fontSize = balloonSize + "px";
+
+          //ballon explodes:
+          if (balloonSize > 60) {
+            balloon.textContent = "💥";
+            console.log("Balloon exploded, event listeners no longer function");
+            removeEventListener("keyup", keyUpFunction);
+            removeEventListener("keydown", keyDownFunction);
+          }
+        }
+      };
+
+      // addEventListener("keydown", event => {
+      // to remove add event listener required naming the function (not anonymous function)
+      addEventListener("keydown", keyDownFunction);
+
+      function keyDownFunction(e) {
+        if (event.key == "ArrowDown") {
+          //stop from scrolling:
+          event.preventDefault();
+
+          // stop from going below min size:
+          if (balloonSize > 26) {
+            balloonSize -= 10;
+            balloon.style.fontSize = balloonSize + "px";
+          }
+        }
+      };
+
+    </script>
+
+
+EXERCISE - MOUSE TRAIL:
+
+A series of images to follow the mouse pointer.
+Use absolutely positioned <div> elements with a fixed size and background color.
+Create a bunch of these, and when the mouse moves, they follow.
+
+    <body>
+      <div class="trail"></div>
+      <div class="trail"></div>
+      <div class="trail"></div>
+      <div class="trail"></div>
+      <div class="trail"></div>
+      <div class="trail"></div>
+
+      <style>
+        .trail { /* className for the trail elements */
+          position: absolute;
+          height: 6px; width: 6px;
+          border-radius: 3px;
+          background: teal;
+          visibility: hidden; /*make invisible to start*/
+        }
+        body {
+          height: 300px;
+        }
+      </style>
+
+      <script>
+          let allDivs = document.getElementsByTagName("div");
+          //NOTE this is an array-like object!
+          // console.log(allDivs);
+
+          let nextDiv = 0;
+          // console.log(allDivs[nextDiv]);
+
+          addEventListener("mousemove", event => {
+
+            allDivs[nextDiv].style.left = event.pageX + "px"; //mouse X coord
+            allDivs[nextDiv].style.top = event.pageY + "px"; //mouse Y coord
+
+
+            // make the .trail class visible now that mose has moved:
+
+            // THIS DOES NOT WORK ON THE CSS CLASS ITSELF, BUT ON EACH ELEMENT:
+            //document.getElementsByClassName("trail").style.visibility = "visible";
+            document.getElementsByTagName("div")[nextDiv].style.visibility = "visible";
+            // REMEMBER IT IS AN array-like object.
+
+            nextDiv++;
+            console.log(nextDiv);
+
+            // don't go past number of div elements:
+            // console.log(allDivs.length);
+            if (nextDiv > allDivs.length-1) {
+              nextDiv = 0;
+            }
+
+          });
+      </script>
+    </body>
+
+
+EXERCISE - TABS / TABBED PANNELS:
+Create a tabbed interface.
+
+Write a functin "asTabs", that takes a DOM node,
+and shows the child elements of that node to create a tabbed interfce.
+It then inserts a list of <button> elements at the top of the node,
+one for each child element.
+The button will contain text that is retreived from the childs attribute "data-tabname".
+
+All the child nodes will be hidden (their style display property),
+except for one.
+
+<tab-panel>
+  <div data-tabname="one">Tab one</div>
+  <div data-tabname="two">Tab two</div>
+  <div data-tabname="three">Tab three</div>
+</tab-panel>
 
 <script>
+  function asTabs(node) {
+    // Your code here.
+  }
+
+  asTabs(document.querySelector("tab-panel"));
 </script>
+
+HINT: to avoid issues due to childNodes being a data structure that is updated live,
+and whitespaces between nodes are also in there.
+Start by building an array of tabs to have easier access to them.
