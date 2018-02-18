@@ -6,11 +6,13 @@
   </head>
   <body>
 
+    <!-- <tab-panel> -->
     <div id="wrapper">
       <div data-tabname="one">Tab one</div>
       <div data-tabname="two">Tab two</div>
       <div data-tabname="three">Tab three</div>
     </div>
+    <!-- </tab-panel> -->
 
     <script>
       function asTabs(node) {
@@ -55,6 +57,9 @@
             // "tabs" is the array of all the tabs breated in beginning
             for (let tab of tabs) {
               // wuuuuuuut????
+              // note "==" is a comparator,
+              // so perhaps it is setting "selected" as true or false,
+              // based on if tab == selectedTab is true or false
               let selected = tab == selectedTab;
 
               // only the node of the selected tab will be displayed:
@@ -72,6 +77,7 @@
       }
 
       asTabs(document.querySelector("#wrapper"));
+      // asTabs(document.querySelector("tab-panel"));
     </script>
 
   </body>

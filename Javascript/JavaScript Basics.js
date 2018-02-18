@@ -175,7 +175,9 @@ in that it influences the progress of a loop.
 When continue is encountered in a loop body, control jumps out of the body
  and continues with the loop’s next iteration.
 
- FUNCTIONS:
+
+
+FUNCTIONS:
 
  The function keyword, when used as an expression, can create a function value.
  When used as a statement, it can be used to declare a variable and give it a function as its value.
@@ -321,12 +323,45 @@ Recursion example:
 
 
 A "PURE" FUNCTION:
-A pure function is a specific kind of value-producing function that not only has no side effects,
- but also doesn’t rely on side effects from other code—for example,
- it doesn’t read global variables that are occasionally changed by other code.
- A pure function has the pleasant property that, when called with the same arguments,
- it always produces the same value (and doesn’t do anything else).
+A pure functin is a specific kind of value-producing functin that not only has no side effects,
+but also doesn’t rely on side effects from other code—for example,
+it doesn’t read global variables that are occasionally changed by other code.
+A pure functin has the pleasant property that, when called with the same arguments,
+it always produces the same value (and doesn’t do anything else).
 
+
+
+ARROW FUNCTIONS
+NEW FROM 3RD EDITION OF BOOK WHICH INCLUDES ES2015 to ES2017.
+
+This is written as => to be a less verbose way of writting a functin.
+
+The => basically reads as:  "this input (the arguments) produces this result (the function body)."
+
+const power = (base, exponent) => {
+  let result = 1;
+  for (let count = 0; count < exponent; count++) {
+    result *= base;
+  }
+  return result;
+}
+
+
+When there is only one argument/parameter, you dont need the "()".
+And when the body is only one line, you dont need the "{}" or the "return".
+So these are both the same:
+
+const square1 = (x) => { return x * x; };
+const square2 = x => x * x;
+
+
+When there are NO arguments/parameters provided to the functin, you need an empty "()":
+
+const basic = () => { console.log("no arguments here!"); }
+
+
+There is "almost" no reason to have both arrow functions and regular functions in the same code,
+except for a minor situation, which is explained in "chapter 6" of Eloquent JS 3rd Edition.
 
 
 ARRAYS and OBJECTS:
