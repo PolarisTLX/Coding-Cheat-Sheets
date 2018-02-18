@@ -380,7 +380,7 @@ You can see them as long, flat octopuses with all their arms in a neat row, labe
 
 
 value.x  VS  value[x] to access a property value:
-They don't necessarily return the same property.
+They dont necessarily return the same property.
 The difference is in how x is interpreted.
 
 When using value.x,  "x" must directly name a valid property.
@@ -712,6 +712,108 @@ A more convenient way to create objects that derive from some shared prototype i
 NOTE: The actual prototype of a constructor is Function.prototype since constructors are functions.
 
 An object created with "new" is said to be an instance of its constructor(){}.
+
+
+
+NEW FOR 3RD EDITION OF ELOQUEWNT JS INCORPORATING ES2015-ES2017:
+CLASSES
+
+JavaScript ES5s "prototype" system is a somewhat informal / not great attempt
+at creating a basic concept in Object Oriented called CLASSES.
+
+A class defines the shape of a type of object: what methods and properties it has.
+Such an object is an "instance of a class".
+
+Since ES6 / ES2015, classes were introduced, and there is no more need to use "prototype" (?)
+
+Prototypes are useful for defining properties for which all instances of a class share the same value,
+such as methods.
+Properties that differ per instance, such as the rabbits "type" property in a previous example,
+need to be stored directly in the objects themselves.
+
+So to create an instance of a class, you have to make an object that derives from the proper prototype.
+But you also have to make sure that it itself has the properties that instances of this class are supposed to have.
+This is what a constructor function does.
+
+    function makeRabbit(type) {
+      let rabbit = Object.create(protoRabbit);
+      rabbit.type = type;
+      return rabbit;
+    }
+
+
+JS provides a way of making this easier with the "new" keyword.
+If you put the "new" in front of a functin call, that functin is treated as a constructr.
+This makes sure that an object with the right protype is automatically created,
+bound to the "this" in the functin, and returned at the end of that functin.
+
+The appropriate object for a constructr is found by taking the prototype property of the contructr functin:
+
+    function Rabbit(type) {
+      this.type = type;
+    }
+
+    Rabbit.prototype.speak = function(line) {
+      console.log(`The ${this.type} rabbit says '${line}'`);
+    };
+
+    let weirdRabbit = new Rabbit("weird");
+
+Constructors, and all objects, automatically get a property called "prototype",
+this holds an empty object that is derived from Object.prototype.
+You can override it with a new object if you want,
+or you can just add properties to it, like the example above.
+
+The names of constructors are capitalized so they stand out.
+
+CLASS NOTATION - THE 2015+ STUFF:
+
+JavaScript CLASSES are constructr functions with a prototype property.
+That was how you had to write them.
+But now there is a less awkward notation, below achieves the same as above:
+
+    class Rabbit {
+      constructor(type) {
+        this.type = type;
+      }
+      speak(line) {
+        console.log(`The ${this.type} rabbit says '${line}'`);
+      }
+    }
+
+    let weirdRabbit = new Rabbit("weird");
+
+
+All of the methods you want to associate to Rabbit can now be written in one place,
+inside the { } of class Rabbit {...}.
+The first one "constructor{...}" is treated specially,
+as the name implies it is the actual constructr functin that will be bound to the name Rabbit.
+The other methods added afterwards are what will be packaged into that constructors prototype.
+
+CLASSES only allow methods (properties that hold functions) to be added to the prototype.
+You cannot save non-functin values in there.
+But you can still create such properties after youve defined the class
+(outside/after the classes {} curly brakets).
+
+
+Class can be used both in statement and in expression positions
+(before and after the equals = sign?)
+just like functions.
+
+When used as an expression, it doesnt define a binding,
+it just produces the constructr as a value.
+You can omit the class name in a class expression:
+
+let object = (new class { getWord() { return "hello"; } });
+console.log(object.getWord());
+// hello
+
+
+
+
+
+
+END OF NEW STUFF FROM 3RD EDITION
 
 
 
