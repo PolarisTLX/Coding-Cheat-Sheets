@@ -283,7 +283,7 @@ console.log(simpleLevel.width, "by", simpleLevel.height);
 Now to display the levels on the screen and model time and motion:
 
 
-SEPCIAL SECTION TO NOTE ABOUT ENCAPSULATION:
+SPECIAL SECTION TO NOTE ABOUT ENCAPSULATION:
 Encapsulation is not applied very much in the project for 2 reasons:
 Problems with encapsulation:
 
