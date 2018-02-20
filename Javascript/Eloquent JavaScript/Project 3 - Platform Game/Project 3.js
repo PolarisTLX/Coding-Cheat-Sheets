@@ -300,3 +300,144 @@ because their interfaces wouldnt cover the new situation.
 
 Trying to encapsulate something that isnt an ideal/suitable boundary will end up wasting a lot of energy and time.
 Youll notice your interfaces get awkwardly large and will need to be modified often as the program evolves.
+
+
+// CONTINUE FROM COFFEE & CODE
+
+The one thing that will be encapsulated will be the drawing subsystem,
+since it will be used again in the next chapter (using <canvas>?)
+
+DRAWING:
+
+The encapsulation of the drawing code is done by defining a "display" object,
+which displays a given level and current state.
+The display type used here is called DOMDisplay, because it uses just simple DOM elements.
+
+this helper functin creates an element and gives it some attributes + child nodes,
+and it does so in a succinct way:
+
+    function elt(name, attrs, ...children) {
+      let dom = document.createElement(name);
+      for (let attr of Object.keys(attrs)) {
+        dom.setAttribute(attr, attrs[attr]);
+      }
+      for (let child of children) {
+        dom.appendChild(child);
+      }
+      return dom;
+    }
+
+A display is created by giving it a parent element to which it should append itself and a level object.
+
+    class DOMDisplay {
+      constructor(parent, level) {
+        this.dom = elt("div", {class: "game"}, drawGrid(level));
+        this.actorLayor = null;
+        parent.appendChild(this.dom);
+      }
+
+      clear() { this.dom.remove(); }
+    }
+
+
+Because our game is in 1 x 1 units in a grid, we use a constant "scale"
+to give the number of pixels a single unit takes on the screen.
+
+    const scale = 20;
+
+The background level grid only needs to be drawn once, and as a <table> element.
+While movable actors are re-drawn every time the display is updated with a given state.
+
+The property "actorLayer" is used to track the element that holds the actors,
+so that they can easily be removed and redrawn.
+
+
+The gackground level drawn as a <table> element:
+
+    function drawGrid(level) {
+      return elt("table", {
+        class: "background",
+        style: `width: ${level.width * scale}px`
+      }, ...level.rows.map(row =>
+        elt("tr", {style: `height: ${scale}px`},
+            ...row.map(type => elt("td", {class: type})))
+      ));
+    }
+
+Each row of the grid is turned into a table row, <tr> element.
+The strings in the grid are used as class names for the table cell elements <td>
+The spread operator ("...") is used to pass arrays of child nodes to elt as separate arguments.
+
+
+Now this CSS makes the table look like the background we want:
+
+    .background    {  background: rgb(52, 166, 251);
+                      table-layout: fixed;
+                      border-spacing: 0;              }
+    .background td {  padding: 0; }
+    .lava          {  background: rgb(255, 100, 100); }
+    .wall          {  background: white; }
+
+Some of the details above are used to prevent unwanted default browser behavior.
+We dont want the layout to depend on the content of its cells,
+and we dont want there to be space pr padding between the cells.
+
+
+ We draw each Actor by creating a DOM element for it
+ and setting that elements position and size based on the actors properties.
+ The units again need to be multiplied be "scale" to work with pixels.
+
+     function drawActors(actors) {
+       return elt("div", {}, ...actors.map(actor => {
+         let rect = elt("div", {class: `actor ${actor.type}`});
+         rect.style.width = `${actor.size.x * scale}px`;
+         rect.style.height = `${actor.size.y * scale}px`;
+         rect.style.left = `${actor.pos.x * scale}px`;
+         rect.style.top = `${actor.pos.y * scale}px`;
+       }));
+     }
+
+ To give an element more than one class, we separate the class names by spaces.
+ We need to give the actors a position of "absolute" using CSS.
+
+     .actor { position: absolute; }
+
+ We also give the actors their colors:
+
+     .coin { background: rgb(241, 229, 89); }
+     .player { background: rgb(64, 64, 64); }
+
+
+When the disaplyt is updated, the drawState method first removes the old actors,
+then redraws them in their new positions.
+We cant reuse DOM elements for actors, because that would require a lot more code
+to make sure that we remove elements when their actors vanish.
+And redrawing them is not that intensive since there are not that many.
+
+    DOMDisplay.prototype.drawState = function(state) {
+      if (this.actorLayer) {
+        this.actorLayer.remove();
+      }
+      this.actorLayer = this.dom.appendChild(drawActors(state.actors));
+      this.dom.className = `game ${state.status}`;
+      this.scrollPlayerIntoView(state);
+    };
+
+
+We can style the "player" actor differently depending on if the level was won or lost,
+by adding the levels current status as a class name to the wrapper,
+using a CSS rule that takes effect only when the player has an ancestor element with a given class:
+
+    .lost player { background: rgb(160, 64, 64); }
+    .won player { box-shadow: -4px -7px 8px white, 4px -7px 8px white; }
+
+So after toucing the lava, the player turns dark red.
+When the player wins by collecting the last coin, we create a whie halow effect
+by adding two blurred white shaddows on top left and top right of the player.
+
+
+
+We use  "scrollPlayerIntoView" for when a level doesnt fit into the viewport.
+It makes sure that the viewport is scrolled so that player is near the center.
+
+ 
