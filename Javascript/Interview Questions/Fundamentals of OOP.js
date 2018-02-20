@@ -23,6 +23,25 @@ and then writing code that works on any object with the interface is called poly
 It is very useful.
 
 
+Problems with encapsulation:
+Encapsulation should not be applied to small projects for these 2 reasons:
+
+1. Encapsulation takes extra effort and makes programs bigger,
+it requires additional concepts and interfaces to be introduced.
+To prevent confusion, keep program small if possible.
+
+2. The various elements of this game are so closely tied together,
+that if the behavior of one changed, it is unlikely that any of the others
+would be able to stay the same.
+Interfaces would need to have incorporated a lot of assumptions which makes them less effective,
+and whenever you change one part of the system, youll have to worry about the way it impacts the other parts,
+because their interfaces wouldnt cover the new situation.
+
+Trying to encapsulate something that isnt an ideal/suitable boundary will end up wasting a lot of energy and time.
+Youll notice your interfaces get awkwardly large and will need to be modified often as the program evolves.
+
+
+
 
 INHERITANCE:
 To avoid writting a whole new constructor with all three methods,
