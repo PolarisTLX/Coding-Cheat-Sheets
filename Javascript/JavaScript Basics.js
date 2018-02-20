@@ -177,6 +177,21 @@ When continue is encountered in a loop body, control jumps out of the body
 
 
 
+TEMPLATE LITERALS:
+NEW IN ES6/ES2015+ IN ELOQUENT JS 3RD EDITION:
+
+Backtick-quote strings, ``, or template literals, can do more than just plain quotes.
+-They can span multiple lines,
+-They can embed other values within them:
+
+`half of 100 is ${100 / 2}`;
+// half of 100 is 50
+
+What is written inside a ${} of a template string,
+the result will be computed, then converted into a string and included in that position.
+
+
+
 FUNCTIONS:
 
  The function keyword, when used as an expression, can create a function value.
