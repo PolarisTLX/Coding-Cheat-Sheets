@@ -439,5 +439,71 @@ by adding two blurred white shaddows on top left and top right of the player.
 
 We use  "scrollPlayerIntoView" for when a level doesnt fit into the viewport.
 It makes sure that the viewport is scrolled so that player is near the center.
+And to make sure that anything that sticks out of the elements box is not visible,
+we use this CSS to give the games DOM element a maximum size:
+We also give the outer element a relative position,
+so that the actors inside are positioned relative to the top-left corner.
 
- 
+    .game {
+      overflow: hidden;
+      max-width: 600px;
+      max-height: 450ps;
+      position: relative;
+    }
+
+
+In the scrollPlayerIntoView method, we find the players position
+and update the wrapping element''s scroll position.
+We change the scroll position by manipulating that element''s "scrollLeft" and "scrollTop" properties
+when the player is too close to the edge.
+
+    DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
+      let width = this.dom.clientWidth;
+      let height = this.dom.clientWidth;
+      let margin = width / 3;
+
+      // The viewport:
+      let left = this.dom.scrollLeft, right = left + width;
+      let top = this.dom.scrollTop, bottom = top + height;
+
+      let player = state.player;
+      let center = player.pos.plus(player.size.times(0.5)).times(scale);
+
+      if (center.x < left + margin) {
+        this.dom.scrollLeft = center.x - margin;
+      } else if (center.x > right - margin) {
+        this.dom.scrollLeft = center.x + margin - width;
+      }
+      if (center.y < top + margin) {
+        this.dom.scrollTop = center.y - margin;
+      } else if (center.y > bottom - margin) {
+        this.dom.scrollTop = center.y + margin - height;
+      }
+    };
+
+The way to find the center of the player is done by adding the top-left corner and half its size.
+Then we have to multiply it by the display scale to get it in pixel coordinates.
+
+Then a series of checks verifies that the player position isnt outside of the allowed range.
+Note that this will sometimes set nonsense scroll coordinates, such as < 0 or beyond the scrolable area.
+But the DOM will contrain them to acceptable values.
+Setting "scrollLeft" to -10 will just be turned into 0.
+
+It would be simpler to just always have the player always be in the exact center,
+but that would be very visually unpleasing.
+
+
+We can now display our tiny level:
+
+    <link rel="stylesheet" href="css/game.css">
+    // this is to load a CSS file into a page.
+    // in this case the file game.css that contains the styles necessary for our game. 
+
+    <script>
+      let simpleLevel = new Level(simpleLevelPlan);
+      let display = new DOMDisplay(document.body, simpleLevel);
+      display.drawState(State.start(simpleLevel));
+    </script>
+
+
+// END OF COFFEE and CODE
