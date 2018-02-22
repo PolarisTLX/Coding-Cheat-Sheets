@@ -497,7 +497,7 @@ We can now display our tiny level:
 
     <link rel="stylesheet" href="css/game.css">
     // this is to load a CSS file into a page.
-    // in this case the file game.css that contains the styles necessary for our game. 
+    // in this case the file game.css that contains the styles necessary for our game.
 
     <script>
       let simpleLevel = new Level(simpleLevelPlan);
@@ -507,6 +507,7 @@ We can now display our tiny level:
 
 
 // END OF COFFEE and CODE
+
 
 MOTION AND COLLISION:
 
