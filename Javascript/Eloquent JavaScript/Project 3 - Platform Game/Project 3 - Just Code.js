@@ -188,3 +188,123 @@ console.log(simpleLevel.width, "by", simpleLevel.height);
 
 
 //Now to display the levels on the screen and model time and motion:
+
+function elt(name, attrs, ...children) {
+    let dom = document.createElement(name);
+    for (let attr of Object.keys(attrs)) {
+      dom.setAttribute(attr, attrs[attr]);
+    }
+    for (let child of children) {
+      dom.appendChild(child);
+    }
+    return dom;
+}
+
+
+class DOMDisplay {
+  constructor(parent, level) {
+    this.dom = elt("div", {class: "game"}, drawGrid(level));
+    this.actorLayor = null;
+    parent.appendChild(this.dom);
+  }
+
+  clear() { this.dom.remove(); }
+}
+
+
+const scale = 20;
+
+
+function drawGrid(level) {
+  return elt("table", {
+    class: "background",
+    style: `width: ${level.width * scale}px`
+  }, ...level.rows.map(row =>
+    elt("tr", {style: `height: ${scale}px`},
+        ...row.map(type => elt("td", {class: type})))
+  ));
+}
+
+
+.background    {  background: rgb(52, 166, 251);
+                  table-layout: fixed;
+                  border-spacing: 0;              }
+.background td {  padding: 0; }
+.lava          {  background: rgb(255, 100, 100); }
+.wall          {  background: white; }
+
+
+
+function drawActors(actors) {
+   return elt("div", {}, ...actors.map(actor => {
+     let rect = elt("div", {class: `actor ${actor.type}`});
+     rect.style.width = `${actor.size.x * scale}px`;
+     rect.style.height = `${actor.size.y * scale}px`;
+     rect.style.left = `${actor.pos.x * scale}px`;
+     rect.style.top = `${actor.pos.y * scale}px`;
+   }));
+}
+
+.actor { position: absolute; }
+
+.coin { background: rgb(241, 229, 89); }
+.player { background: rgb(64, 64, 64); }
+
+
+DOMDisplay.prototype.drawState = function(state) {
+    if (this.actorLayer) {
+      this.actorLayer.remove();
+    }
+    this.actorLayer = this.dom.appendChild(drawActors(state.actors));
+    this.dom.className = `game ${state.status}`;
+    this.scrollPlayerIntoView(state);
+};
+
+.lost player { background: rgb(160, 64, 64); }
+.won player { box-shadow: -4px -7px 8px white, 4px -7px 8px white; }
+
+.game {
+  overflow: hidden;
+  max-width: 600px;
+  max-height: 450px;
+  position: relative;
+}
+
+
+DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
+    let width = this.dom.clientWidth;
+    let height = this.dom.clientWidth;
+    let margin = width / 3;
+
+    // The viewport:
+    let left = this.dom.scrollLeft, right = left + width;
+    let top = this.dom.scrollTop, bottom = top + height;
+
+    let player = state.player;
+    let center = player.pos.plus(player.size.times(0.5)).times(scale);
+
+    if (center.x < left + margin) {
+      this.dom.scrollLeft = center.x - margin;
+    } else if (center.x > right - margin) {
+      this.dom.scrollLeft = center.x + margin - width;
+    }
+    if (center.y < top + margin) {
+      this.dom.scrollTop = center.y - margin;
+    } else if (center.y > bottom - margin) {
+      this.dom.scrollTop = center.y + margin - height;
+    }
+};
+
+// We can now display our tiny level:
+
+    // <link rel="stylesheet" href="css/game.css">
+    // // this is to load a CSS file into a page.
+    // // in this case the file game.css that contains the styles necessary for our game.
+    //
+    // <script>
+    //   let simpleLevel = new Level(simpleLevelPlan);
+    //   let display = new DOMDisplay(document.body, simpleLevel);
+    //   display.drawState(State.start(simpleLevel));
+    // </script>
+
+//CODE WORKS UP TO HERE
