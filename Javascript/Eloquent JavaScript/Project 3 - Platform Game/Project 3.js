@@ -507,3 +507,305 @@ We can now display our tiny level:
 
 
 // END OF COFFEE and CODE
+
+MOTION AND COLLISION:
+
+Split time into small steps, and for each step, move the actors by a distance
+corresponding to their speed multiplied by the size of the time step in seconds.
+
+discussions on collisions that Ive already learned before...
+
+This method tells us whether an a rectangle (by its position and size),
+touches a grid element of the given type:
+
+    Level.prototype.touches = function(pos, size, type) {
+      /* this figures out the background grid squares that an actor touches.
+         note that an actor may not fit perfectly on top of 1 square,
+         but may be partially on one and partially on the other, touching both.
+         all of the squares touched is calculated with Math.floor and Math.ceil. */
+      var xStart = Math.floor(pos.x);
+      var xEnd = Math.ceil(pos.x + size.x);
+      var yStart = Math.floor(pos.y);
+      var yEnd = Math.ceil(pos.y + size.y);
+
+      /* loop over the block of background grid squares
+         and return true when a matching square is found.
+          Edges of the level are always a "wall" */
+      for (var y = yStart; y < yEnd; y++) {
+        for (var x = xStart; x < xEnd; x++) {
+          let isOutside = x < 0 || x >= this.width ||
+                          y < 0 || y >= this.height;
+          let here = isOutside ? "wall" : this.rows[y][x];
+          if (here == type) return true;
+        }
+      }
+      return false;
+    };
+
+
+The state "update" method uses "touches" to figure out if the player is touching lava:
+
+    // it is passed a time step and keys (which is a data structure which says which keys are being held down)
+    State.prototype.update = function(time, keys) {
+      // it first calls the update method on all actors, producing and array of updated actors.
+      let actors = this.actors.map(actor => actor.update(time, this, keys));
+      // the actors also get the time step, the keys and the state, from which to base their update from
+      // note, only the player interacts with the keys.
+      let newState = new State(this.level, actors, this.status);
+
+      // if the game is already over (status != "playing"), just "return" as no need to continue further.
+      if (newState.status != "playing") return newState;
+
+      // check if the player is touching lava,
+      // if so, status = "lost" and game is done, call return.
+      let player = newState.player;
+      if (this.level.touches(player.pos, player.size, "lava")) {
+        return new State(this.level, actors, "lost");
+      }
+
+      // check if any other actors (like coins) are touching the player:
+      // this is done with the overlap function, described below.
+      // it loops through all the actors + the player,
+      // overlap returns true if there is overlap with the player.
+      for (let actor of actors) {
+        if (actor != player && overlap(actor, player)) {
+          // if overlap == true, the "collide" method updates the state.
+          newState = actor.collide(newState);
+        }
+      }
+      return newState;
+    };
+
+    // this returns true if there is any overlap with the player.
+    function overlap(actor1, actor2) {
+      return actor1.pos.x + actor1.size > actor2.pos.x &&
+             actor1.pos.x < actor2.pos + actor2.size.x &&
+             actor1.pos.y + actor1.size.y > actor2.pos.y &&
+             actor1.pos.y < actor2.pos.y + actor2.size.y;
+    }
+
+
+WHAT EACH KIND OF COLLISION DOES:
+Touching the lava will change the game status to "lost".
+
+    Lava.prototype.collide = function(state) {
+      return new State(state.level, state.actors, "lost");
+    };
+
+Coins vanish when the player touches them.
+The status gets changes to "won" when all coins have been touched.
+
+    Coin.prototype.collide = function(state) {
+      let filtered = state.actors.filter(a => a != this);
+      let status = state.status;
+      if (!filtered.some(a => a.type == "coin")) status = "won";
+      return new State(state.level, filtered, status);
+    };
+
+
+ACTOR UPDATES
+
+Each actor .update method takes as arguments:
+the time step, the state object, and (for some) the keys object.
+
+    Lava.prototype.update = function(time, state) {
+      // new position calculated from adding the time step * current speed to the old position:
+      let newPos = this.pos.plus(this.speed.times(time));
+      // if there is no obstacle (.touches = false), it moves there,
+      if (!state.level.touches(newPos, this.size, "wall")) {
+        return new Lava(newPos, this.speed, this.reset);
+      // if there is obstacle, the behavior depends on type of lava
+      } else if (this.reset) {
+        // dripping lava here? it has a reset position, it goes back to reset position after it hits sometime (mimicinc the next droplet?)
+        return new Lava(this.reset, this.speed, this.reset);
+      } else {
+        // bouncing lava goes in oposite direction by doing speed * -1
+        return new Lava(this.pos, this.speed.times(-1));
+      }
+    };
+
+
+Coins ignore collision since they just wobble in their own square.
+They use their "act" method to wobble.
+
+    const wobbleSpeed = 8, wobbleDist = 0.07;
+
+    Coin.prototype.update = function(time) {
+      // wobble is tied to time:
+      let wobble = this.wobble + time * wobbleSpeed;
+      // Math.sin to find new oscillating positon:
+      let wobblePos = Math.sin(wobble) * wobbleDist;
+      // the position is then calculated from its base position and an offset based on the wobblePos:
+      return new Coin(this.basePos.plus(new Vec(0, wobblePos)), this.basePos, wobble);
+    };
+
+
+Player motion is handled seperately per axis,
+because touching the floor should not prevent sideways movement and vice versa.
+
+
+    const playerXSpeed = 7;
+    const gravity = 30;
+    const jumpSpeed = 17;
+
+    Player.prototype.update = function(time, state, keys) {
+      // HORIZONTAL MOVEMENT
+      let xSpeed = 0;
+      if (keys.ArrowRight) {
+        xSpeed += playerXSpeed;
+      }
+      if (keys.ArrowLeft) {
+        xSpeed -= playerXSpeed;
+      }
+
+      let pos = this.pos;
+      // calc how much player moved horizontally, based on time and speed:
+      let movedX = pos.plus(new Vec(xSpeed * time, 0));
+      // if there are no obstables (.touches = false):
+      if (!state.level.touches(movedX, this.size, "wall")) {
+        pos = movedX;
+      }
+
+      // VERTICAL MOVEMENT
+      let ySpeed = this.speed.y + time * gravity;
+      // calc how much player moved vertically, based on time, speed and gravity:
+      let movedY = pos.plus(new Vec(0, ySpeed * time));
+      // if there are no obstables (.touches = false):
+      if (!state.level.touches(movedY, this.size, "wall")) {
+        pos = movedY;
+        // if touching a floor, and pressing the up key, move up, or jump
+        // RECALL THAT "UP" MEANS NEGATIVE Y VALUES!!!
+      } else if (keys.ArrowUp && ySpeed > 0) {
+        ySpeed = -jumpSpeed;
+        // in other cases, the player bumped into something, so set speed to 0:
+      } else {
+        ySpeed = 0;
+      }
+      return new Player(pos, new Vec(xSpeed, ySpeed));
+    };
+
+
+TRACKING THE KEYS:
+
+For this game, we want the effect of key-presses to stay active as long as they are held down.
+We will set up a key handler that stores the current state of the left, right and up keys.
+We also need to apply .preventDefault() so that they dont cause scrolling.
+
+This functin is given an array of key names, and returns an object that
+tracks the current position of those keys, registering "keydown" and "keyup" events.
+When the key code in the event is present in the set of codes it is tracking, updates the object.
+
+
+    function trackKeys(keys) {
+      let down = Object.create(null);
+      function track(event) {
+        if (keys.includes(event.key)) {
+          down[event.key] == event.type == "keydown";
+          event.preventDefault();
+        }
+      }
+      addEventListener("keydown", track);
+      addEventListener("keyup", track);
+      return down;
+    }
+
+    const arrowKeys = trackKeys(["ArrowLeft", "ArrowRight", "ArrowUp"]);
+
+Both event types are covered by the one handler functin.
+It looks at the object''s type property to determine if the keystate should be updated
+to true (for "keydown") or false (for "keyup").
+
+
+RUNNING THE GAME:
+
+The game is animated with the "requestAnimationFrame" functin.
+But the interface is quite primitive and would recall we call it after every frame.
+
+We will define a helper functin that wraps those boring parts in a convenient interface
+where we can just call "runAnimation", provide it a functin that expects a time difference as argument,
+and draws a single frame.  When the frame function returns the value "false", the animation stops.
+
+
+    function runAnimation(frameFunc) {
+      let lastTime = null;
+      function frame(time) {
+        if (lastTime != null) {
+          let timeStep = Math.min(time - lastTime, 100) / 1000;
+          if (frameFunc(timeStep) === false) return;
+        }
+        lastTime = time;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+The maximum frame step is set to 100 miliseconds.
+When the browser window is not open, the calls to requestAnimationFrame are suspended.
+The difference between "lastTime" and "time" will be the time the page was not open.
+This prevents really weird behavior.
+It also converts time steps to seconds instead of miliseconds to be easier to think about.
+
+
+The functin "runLevel" takes a "Level" object, a constructr for a display and returns a promise.
+It displays the level in document.body, and lets the user play it.
+After a level is finished, it creates a 1 second delay (so the user can see what happened),
+then clears the display, stops the animation, and resolves the promise to the game''s end status.
+
+    function runLevel(level, Display) {
+      let display = new Display(document.body, level);
+      let state = State.start(level);
+      let ending = 1;
+      return new Promise(resolve => {
+        runAnimation(time => {
+          state = state.update(time, arrowKeys);
+          display.drawState(state);
+          if (state.status == "playing") {
+            return true;
+          } else if (ending > 0) {
+            ending -= time;
+            return true;
+          } else {
+            display.clear();
+            resolve(state.status);
+            return false;
+          }
+        });
+      });
+    }
+
+
+When the player dies, the current level is restarted,
+When the player wins, they move onto the next level.
+This functin "runGame" takes care of this,
+it takes a array of level plans, which are each strings and displays a constructr.
+
+    async function runGame(plans, Display) {
+      for (let level = 0; level < plan.length;) {
+        let status = await runLevel (new Level(plans[level]), Display);
+        if (status == "won") {
+          level++;
+        }
+        console.log("You've won! (beaten all the levels?)");
+      }
+    }
+
+
+Because "runLevel" is written to return a promise,
+"runGame" can be written using an async functin.
+It also returns a promise, which resolves when the user finished the game / all levels.
+
+The levels strings are set in a file called "game_levels.js".
+
+
+<link rel="stylesheet" href="css/game.css">
+
+<body>
+  <script>
+    runGame(GAME_LEVELS, DOMDisplay);
+  </script>
+</body>
+
+
+END OF MAIN GAME PROJECT
+
+ADDITIONAL EXERCISES
