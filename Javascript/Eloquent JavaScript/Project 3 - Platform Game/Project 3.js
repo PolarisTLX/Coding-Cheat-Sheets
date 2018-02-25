@@ -810,3 +810,7 @@ The levels strings are set in a file called "game_levels.js".
 END OF MAIN GAME PROJECT
 
 ADDITIONAL EXERCISES
+
+
+Confirmed with book author that the code for the 3rd edition needs some corrections for this project.
+Will have to come back at a later time to finish and get it working.
