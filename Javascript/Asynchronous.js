@@ -244,3 +244,49 @@ But those that do match are called, and their outcome determines what kind of va
 JavaScript environments can detect when a promise isnt handled,
 and will report this as an error.
 Much like an uncaught exception is handled by the environment.
+
+
+TIMEOUT:
+Makes a request report a failure after a certain period of time of not getting a response.
+
+But we can also make out request functin automatically retry sending the requests
+a few times before giving up.
+We will make our request functin return a promise.
+Callbacks and promises are equivalent in what they can express.
+Callback-based functions can be wrapped to expose a promise-based interface and vice-versa.
+
+Even when a request and its reponse are successfully delivered,
+the response may still indicate a failure.
+Such as when the request tries a request type that has not been identified,
+or the handler throws an error.
+To support this, "send" and "defineRequestType" follow the convention mentioned before,
+where the first argument passed to callbacks is the failure reason, if any,
+and the second is the actual result.
+
+These can be translated to promise resolution and rejection by our wrapper.
+
+    class Timeout extends Error {}
+
+    function request(nest, target, type, content) {
+      return new Promise((resolve, reject) => {
+        let done = false;
+        function attempt(n) {
+          nest.send(target, type, content, (failed, value) => {
+            done = true;
+            if (failed) reject(failed);
+            else resolve(value);
+          });
+          setTimeout(() => {
+            if (done) return;
+            else if (n < 3) attempt(n + 1);
+            else reject(new Timeout("Timed out"));
+          }, 250);
+        }
+        attempt(1);
+      });
+    }
+
+This will work because promises can only be resolved (or rejected) once.
+The first time "resolve" or "reject" is called determines the outcome of the promise,
+and any further calls, such as the timeout arriving after the request finished,
+or a request coming back after another request finished, are ignored.
