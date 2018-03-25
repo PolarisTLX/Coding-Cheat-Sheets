@@ -1019,26 +1019,14 @@ ITERATOR LOOPS :
 
 
 
-COLLECT ITERATOR FOR ARRAYS with ".collect {...}" or ".map {...}" :
-Similar to .map in JS
-
-The collect method takes a code block  ( {...} ),
-and applies the expression in the block to every element in an array.
-
-    fibs = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
-
-    doubled_fibs = fibs.collect { |n| n*2 }
-
-    puts doubled_fibs
-    # =>[2, 2, 4, 6, 10, 16, 26, 42, 68, 110]
-
-
 
 
 # IMPORTANT NOTE ON CODE BLOCKS  (might move this down)
 # Only one code block can be passed at any one time.
 # Its not possible to accept two or more code blocks as parameters to a method.
 # However, code blocks may accept none, one, or more parameters themselves.
+
+
 
 
 
@@ -1363,6 +1351,36 @@ split is also happy splitting on newlines, or multiple characters at once, to ge
 
 
 
+ENUMERABLE ITERATORS :  (SEE SEPERATE FILE FOR MORE COMPLETE VERSION OF THIS )
+".each" / ".each_with_index",
+".select"
+".map" / ".collect"
+.
+.
+
+
+FILTERING ARRAYS with ".select" :
+is the same as  .filter from JavaScript.
+
+    my_array = [1,2,3,4,5,6,7,8,1000]
+
+    my_array.select { |item| item%2 == 0 }
+    #=> [2,4,6,8,1000]
+
+
+
+COLLECT ITERATOR FOR ARRAYS with ".collect {...}" or ".map {...}" :
+Similar to .map in JS
+
+The collect method takes a code block  ( {...} ),
+and applies the expression in the block to every element in an array.
+
+    fibs = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+
+    doubled_fibs = fibs.collect { |n| n*2 }
+
+    puts doubled_fibs
+    # =>[2, 2, 4, 6, 10, 16, 26, 42, 68, 110]
 
 
 
@@ -1556,6 +1574,12 @@ symbol_name: "whatever value"
 
 
 
+>>>>>>>  INTERMEDIATE RUBY CONCEPTS:   <<<<<<<
+
+
+
+
+
 GIVE YOUR OWN METHOD THE ABILITY TO HANDLE CODE BLOCKS with "yield" :
 
     def each_vowel
@@ -1640,6 +1664,18 @@ Example:
 
 
 # NOTE does not need to be an array, but is most likely place to consider using a proc
+
+
+
+
+PASSING AN ARGUMENT TO A PROC:
+
+
+my_proc.call(argument)
+my_proc.call("howdy")
+howdy => nil
+
+
 
 
 
@@ -1763,9 +1799,57 @@ From http://www.eriktrautman.com/posts/ruby-explained-blocks-procs-and-lambdas-a
     -Procs are identical to blocks but you can store them in variables, which lets you pass them into functions as explicit arguments and save them for later. Used explicitly sometimes.
 
     -Lambdas are really full methods that just havent been named. Used rarely.
+             have more flexibility like if you want to treturn multiple values at once (because you can safely use the return statement inside of it).
+             They are stricter on passing the currect the number of arguments to them.
 
     -Methods are a way of taking actual named methods and passing them around as arguments to or returns from other methods in your code. Used rarely.
 
     -Closure is just the umbrella term for all four of those things, which all somehow involve passing around chunks of code.
 
 CLOSURES DEFINITION:
+
+A closure is a computer science way of saying :
+A chunk of code that you can pass around but which hangs onto the variables that you gave it when you first called it.
+
+
+
+
+THE ENUMERABLE MODULE :
+Its a bunch of methods packaged together, that get included into other classes (such as Array and Hash).
+Enumerable contains methods like .map  .each  .select.
+It involved doing something to every item in a collection.
+Like going through each item in an array or each key in a hash.
+
+
+
+
+
+
+
+SCOPES OF VARIABLES :
+(see dedicated file just for this for better understanding)
+
+some variables start with $, @, or @@?
+This helps mark them as global, instance, and class variables (respectively).
+
+NO SYMBOL : basic variable called a "local variable"
+
+Variables that are available everywhere (global variables),
+Variable that are only available inside certain methods (local variables),
+And variable that are members of a certain class (class variables), and variables that are only available to particular instances of a class (instance variables).
+
+
+
+
+OTHER COOL THINGS :
+
+
+Can use underscore in big numbers :
+  1000000 can be written directly as 1_000_000 (one million).
+  Ruby allows this, and it makes it easier to read big numbers!
+
+
+The   " ; "   to make code more compactL
+  Ruby supports ending lines of code with semicolons ( ; ) and allows you to put multiple lines of code
+  onto a single line (for example, x = 10; x += 1 ; putsx ). In this case, it’s been done to save on lines of code in
+  the example, although it’s not considered good style in production-quality Ruby code.
