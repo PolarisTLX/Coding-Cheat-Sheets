@@ -283,6 +283,18 @@ You can check what ASCII value represents what chartacters:
 puts 120.chr
 # => x
 
+
+
+
+IMPORTANT - LOOPING THROUGH EACH LETTER IN A STRING with ".each_char" :
+
+my_string.each_char do |letter|
+  ....
+end
+
+
+
+
 For MULTI-LINE STRINGS :
 
   x = "This is a single line string"
@@ -1351,12 +1363,13 @@ split is also happy splitting on newlines, or multiple characters at once, to ge
 
 
 
-ENUMERABLE ITERATORS :  (SEE SEPERATE FILE FOR MORE COMPLETE VERSION OF THIS )
+ENUMERABLE ITERATORS :  (SEE SEPERATE FILE "Enumarable Iterators - All" in Interview Questions folder FOR MORE COMPLETE VERSION OF THIS )
 ".each" / ".each_with_index",
 ".select"
 ".map" / ".collect"
 .
 .
+ENUMERABLES are types of data, like arrays and hashes, that can be iterated upon to go through each value stored inside.
 
 
 FILTERING ARRAYS with ".select" :

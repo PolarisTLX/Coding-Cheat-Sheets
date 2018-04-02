@@ -53,6 +53,61 @@ instead of having to do  something like "#{matz.number_of_instances}"
 
 
 
+CLASS METHODS (this might not be in the best place) :
+http://www.eriktrautman.com/posts/ruby-explained-classes
+
+There are two good times to use class methods: when you're building new instances of a class that have a bunch of known or "preset" features, and when you have some sort of utility method that should be identical across all instances and won't need to directly access instance variables.
+
+The first case is called a factory method, and is designed to save you from having to keep passing a bunch of parameters manually to your initialize method:
+
+    class Viking
+        def initialize(name, health, age, strength)
+            #... set variables
+        end
+        def self.create_warrior(name)
+            age = rand * 20 + 15   # remember, rand gives a random 0 to 1
+            health = [age * 5, 120].min
+            strength = [age / 2, 10].min
+            Viking.new(name, health, age, strength)  # returned
+        end
+    end
+
+The second case above is more mundane. Often, there are things you need all Vikings to "know" or be able to do:
+
+    class Viking
+      ...
+      def self.random_name      # useful for making new warriors!
+          ["Erik","Lars","Leif"].sample
+      end
+      def self.silver_to_gold(silver_pieces)
+          silver_pieces / 10
+      end
+      class << self           # The less common way
+          def gold_to_silver(gold_pieces)
+              gold_pieces * 10
+          end
+      end
+  end
+
+
+Quick Basics
+
+-CLASSES are useful to use when you want to give methods to your data or have multiple instances of your data
+
+-CLASS METHODS have access to other class methods and class variables but dont have access to instance methods or instance variables
+
+-INSTANCE METHODS can call other instance methods, instance variables, class methods, or class variables
+
+If you are thinking that class variables seem pretty similar to constants, they are only similar in that all instances have access to them. If youve got something that will never, CAN never change, use a constant. If you might ever change it, stick with a class variable. At the very least, it makes your code much more legible.
+
+
+DIFFERENCE BETWEEN A MODULE AND A CLASS:
+Basically, a class can be instantiated but a module cannot. A module will never be anything other than a library of methods. A class can be so much more. If you need to instantiate something or otherwise have it exist over time, thats when you need to use a class instead of a module.
+
+
+
+
+
 INHERITANCE :
 
 In the example below we have defined a class, ApplicationError,
@@ -169,6 +224,14 @@ with each usernames password as the associated value.
 
 
 PRIVATE METHODS IN CLASSES :
+
+'You should change the default thought in your head
+from:  "everything is accessible, what do I need to hide?"
+to:  "everything should be hidden, what do I absolutely need to make externally available?"
+
+That principle will take you far, especially when designing things like APIs that will be used by other programs. The more you make available to people, the harder it will be later on to hide it again.'
+
+
 (This is an example of encapsulation in Ruby, see interview file for more details)
 
 (NOTE: Some Ruby developers do not believe marking methods as private or protected provides any
@@ -255,13 +318,60 @@ with adding on the last line:
     end
 
 
+PROTECTED :
 
-USING "protected" instead of "private" :
+we cant make our #take_damage method private because otherwise we could only call it on the specific viking who is DOING the attacking. We want to call it on the RECIPIENT of the attack (remember, private methods can only be called from within the same instance).
+
+Since we dont want ".take_damage" to be visible to anyone on the command line but we DO want it to be visible to the methods inside other instances of Viking, we call that protected.  protected provides most of the privacy of private but lets the methods inside other instances of the same class or its descendents also access it:
+
+    class Viking < Person
+        ...
+        def attack(recipient)
+            if recipient.dead
+                puts "#{recipient.name} is already dead!"
+                return false
+            end
+            damage = (rand * 10 + 10).round(0)
+            # rand is the keyword to generate a random number in Ruby?
+            recipient.take_damage(damage)  # `take_damage` called on `recipient`!
+        end
+        protected
+            def take_damage(damage)
+                self.health -= damage
+                puts "Ouch! #{self.name} took #{damage} damage and has #{self.health} health left"
+                die if @health <= 0
+                # `die` called from within the same object as take_damage was (the `recipient` as well!)
+            end
+        private
+            def die
+                puts "#{self.name} has been killed :("
+                self.dead = true  # assume we've defined a `dead` instance variable
+            end
+    end
+
+    10.times { oleg.attack(sten) }
+    # Ouch! Sten took 19 damage and has 101 health left
+    # Ouch! Sten took 10 damage and has 91 health left
+    # Ouch! Sten took 13 damage and has 78 health left
+    # Ouch! Sten took 17 damage and has 61 health left
+    # Ouch! Sten took 15 damage and has 46 health left
+    # Ouch! Sten took 11 damage and has 35 health left
+    # Ouch! Sten took 14 damage and has 21 health left
+    # Ouch! Sten took 14 damage and has 7 health left
+    # Ouch! Sten took 18 damage and has -11 health left
+    # Sten has been killed :(
+    # Sten is already dead!
+
+
+More on USING "protected" instead of "private" :
   Ruby supports a third form of encapsulation (other than public and private ) called protected.
   That makes a method private, but within the scope of a class rather than within a single object.
 
 Example on page 124 of Beginning Ruby 3rd Edition.
 http://file.allitebooks.com/20160718/Beginning%20Ruby.pdf
+
+
+
 
 
 
@@ -403,3 +513,17 @@ BANKING CHECK FOR PIN EXAMPLE :
     my_account.display_balance(1234)
     my_account.withdraw(1234, 500_000)
     my_account.display_balance(1234)
+
+
+
+NESTED CLASSES -  "Class::NestedClass"
+
+class Drawing
+  class Line
+  end
+
+  class Circle
+  end
+end
+
+You access class Circle with  Drawing::Circle

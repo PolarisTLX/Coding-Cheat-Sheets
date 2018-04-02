@@ -1,3 +1,31 @@
+Modules simply provide ways to organize methods, classes, and
+constants into separate namespaces.
+
+module NumberStuff
+  def self.random
+    rand(1000000)
+  end
+end
+
+module LetterStuff
+  def self.random
+    (rand(26) + 65).chr
+  end
+end
+
+puts NumberStuff.random  #=> 184783  (this is change each time)
+puts LetterStuff.random  #=> X       (this is change each time)
+
+
+In this demonstration it’s clear which version of random you’re trying to use in the two last lines.
+The modules defined in the preceding code look a little like classes, except they’re defined with the word module instead of class.
+
+However, in reality you cannot define instances of a module, as they’re not actually classes, nor can they inherit from anything.
+Modules simply provide ways to organize methods, classes, and
+constants into separate namespaces.
+
+
+
 There are lots and lots of Ruby tools you might want to use, but it would clutter the interpreter to keep them around all the time. For that reason, we keep a bunch of them in modules and only pull in those module toolboxes when we need the constants and methods inside!
 
 You can think of modules as being very much like classes, only modules cant create instances and cant have subclasses. Theyre just used to store things!
@@ -16,7 +44,7 @@ Ruby constants are written in ALL_CAPS and are separated with underscores if the
 
 
 
-namespacing, and it's how Ruby doesn't confuse Math::PI and Circle::PI.
+namespacing, and its how Ruby doesnt confuse Math::PI and Circle::PI.
 
 See that double colon we just used? That's called the scope resolution operator, which is a fancy way of saying it tells Ruby where you're looking for a specific bit of code. If we say Math::PI, Ruby knows to look inside the Math module to get that PI, not any other PI (such as the one we created in Circle).
 
@@ -34,7 +62,7 @@ A nice effect of this is that you no longer have to prepend your constants and m
 
 
 
-MIXIN with ("nicludes")- MIX TOGETHER THE BEHAVIORS OF A class AND A module :
+MIXIN with ("includes")- MIX TOGETHER THE BEHAVIORS OF A class AND A module :
 
 When a module is used to mix additional behavior and information into a class, its called a mixin. Mixins allow us to customize a class without having to rewrite code!
 

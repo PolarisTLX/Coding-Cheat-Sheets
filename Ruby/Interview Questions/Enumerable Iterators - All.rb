@@ -1,3 +1,5 @@
+ENUMERABLES are types of data, like arrays and hashes, that can be iterated upon to go through each value stored inside.
+
 ENUMERABLE ITERATORS :
 ".each" / ".each_with_index",
 ".sort"
@@ -17,6 +19,9 @@ Even less common:
 ".group_by"
 ".grep"
 
+
+If used on an array, as one example, all of these methods actually use the Array Class’s ".each" method to do their
+jobs.
 
 
 Enumerable Iterators Quick Cheat Sheet :
@@ -91,3 +96,12 @@ Passes each element of the collection to the given block. The method returns tru
 
 ".any?"
 ".none?"
+
+
+
+The Array class (for one) has pre-included the methods provided by the Enumerable module , a module that supplies about 20 useful countingand iteration-related methods, including collect , detect ,
+find , find_all , include? , max , min , select , sort ,and to_a .
+
+All of these use Array ’s each method to do their
+jobs, and if your class can implement an each method, you can include Enumerable , and get all those
+methods for free in your own class!
