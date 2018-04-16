@@ -112,6 +112,10 @@ the extend keyword mixes a module''s methods at the class level.
 This means that class itself can use the methods,
 as opposed to (just?) instances of the class.
 
+
+OR :  http://www.railstips.org/blog/archives/2009/05/15/include-vs-extend-in-ruby/
+  include makes the method available to an instance of a class and extend makes the method available to the class itself.
+
 Example: # ThePresent has a .now method that we'll extend to TheHereAnd
 
     module ThePresent
