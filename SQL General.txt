@@ -1,0 +1,158 @@
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Complete SELECT query:
+
+SELECT DISTINCT column, AGG_FUNC(column_or_expression), …
+FROM mytable
+    JOIN another_table
+      ON mytable.column = another_table.column
+    WHERE constraint_expression
+    GROUP BY column
+    HAVING constraint_expression
+    ORDER BY column ASC/DESC
+    LIMIT count OFFSET COUNT;
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+SELECT column, another_column, … (list all columns you want from ALL the tables here)
+FROM mytable
+INNER/LEFT/RIGHT/FULL JOIN another_table
+    ON mytable.id = another_table.matching_id
+WHERE condition(s)
+ORDER BY column, … ASC/DESC
+LIMIT num_limit OFFSET num_offset;
+
+
+>>>Example query with both column and table name aliases<<<
+(to rename what the column name will appear as in the final output. Can also make the SQL commands shorter)
+SELECT column AS better_column_name, …
+FROM a_long_widgets_table_name AS mywidgets
+INNER JOIN widget_sales
+  ON mywidgets.id = widget_sales.widget_id;
+
+
+>>>Creating new columns from data in existing columns:
+
+Generic example:
+SELECT (column1 + columns2) * 10 AS New_Column_Name
+FROM Table1
+INNER/RIGHT.LEFT/... JOIN Table2
+ON Movies.Id = Boxoffice.Movie_id;
+
+Task: List all movies and their combined sales in millions of dollars
+
+SELECT Title, (Domestic_sales + International_sales)/1000000 AS CombinedSales FROM Movies
+INNER JOIN Boxoffice
+  ON Movies.Id = Boxoffice.Movie_id;
+
+
+
+Task: List all movies that were released on even number years
+
+SELECT Title, Year FROM Movies WHERE Year % 2 = 0;
+
+
+
+
+https://sqlbolt.com/lesson/select_queries_with_aggregates :
+
+Role	     Name	     Building	   Years_employed
+Engineer	 Becky A.	     1e	      4
+Engineer	 Dan B.	       1e	      2
+Engineer	 Sharon F.	   1e	      6
+Engineer	 Dan M.	       1e	      4
+Engineer	 Malcom S.	   1e	      1
+Artist	   Tylar S.	     2w	      2
+Artist	   Sherman D.	   2w	      8
+Artist	   Jakob J.	     2w	      6
+Artist	   Lillia A. 	   2w	      7
+Artist	   Brandon J.	   2w	      7
+Manager	   Scott K.	     1e	      9
+Manager	   Shirlee M.	   1e	      3
+Manager	   Daria O.	     2w	      6
+
+Task: For each role, find the average number of years employed by employees in that role
+
+
+SELECT role, AVG(years_employed) as Average_years_employed
+FROM employees
+GROUP BY role;
+
+Role	     Average_years_employed
+Artist	   6
+Engineer	 3.4
+Manager	   6
+
+
+Task: Find the total number of employee years worked in each building
+
+SELECT Building, SUM(Years_employed) as Total_employee_years
+FROM employees
+GROUP BY Building;
+
+Building	 Total_employee_years
+1e	       29
+2w	       36
+
+
+
+
+FILTERING GROUPED:
+
+One thing that you might have noticed is that if the GROUP BY clause is executed after the WHERE clause (which filters the rows which are to be grouped), then how exactly do we filter the grouped rows?
+
+Luckily, SQL allows us to do this by adding an additional HAVING clause which is used specifically with the  GROUP BY clause to allow us to filter grouped rows from the result set.
+
+Select query with HAVING constraint:
+
+SELECT group_by_column, AGG_FUNC(column_expression) AS aggregate_result_alias, …
+FROM mytable
+WHERE condition
+GROUP BY column
+HAVING group_condition;
+
+
+
+>>>>>>>>>>>>>>>
+https://sqlbolt.com/lesson/select_queries_order_of_execution
+
+Table: Movies (Read-Only)
+Id	Title	Director	Year	Length_minutes
+1	Toy Story	John Lasseter	1995	81
+2	A Bug's Life	John Lasseter	1998	95
+3	Toy Story 2	John Lasseter	1999	93
+4	Monsters, Inc.	Pete Docter	2001	92
+5	Finding Nemo	Andrew Stanton	2003	107
+6	The Incredibles	Brad Bird	2004	116
+7	Cars	John Lasseter	2006	117
+8	Ratatouille	Brad Bird	2007	115
+9	WALL-E	Andrew Stanton	2008	104
+10	Up	Pete Docter	2009	101
+11	Toy Story 3	Lee Unkrich	2010	103
+12	Cars 2	John Lasseter	2011	120
+13	Brave	Brenda Chapman	2012	102
+14	Monsters University	Dan Scanlon	2013	110
+
+
+Table: Boxoffice (Read-Only)
+Movie_id	Rating	Domestic_sales	International_sales
+5	8.2	380843261	555900000
+14	7.4	268492764	475066843
+8	8	206445654	417277164
+12	6.4	191452396	368400000
+3	7.9	245852179	239163000
+6	8	261441092	370001000
+9	8.5	223808164	297503696
+.
+.
+.
+
+Task: Find the number of movies each director has directed ✓
+
+SELECT Director, COUNT(Director) FROM movies GROUP BY Director;
+
+
+Task: Find the total domestic and international sales that can be attributed to each director ✓
+
+SELECT Director, SUM(Domestic_sales+International_sales) FROM movies JOIN Boxoffice ON Movies.Id = Boxoffice.Movie_id GROUP BY Director;
