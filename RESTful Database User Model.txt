@@ -1,0 +1,87 @@
+
+
+Online Platform  has_many  courses
+
+courses 
+	id: integer
+	title: string [unique, present]
+	description: text [present]
+	has_many lessons
+
+
+lesson 
+	id: integer
+	title: string [unique, present]
+	body: text [present]
+	belongs_to courses
+
+
+
+2. You are building the profile tab for a new user on your site. You are already storing your user’s username and email, but now you want to collect demographic information like city, state, country, age and gender. Think – how many profiles should a user have? How would you relate this to the User model?
+
+Users   has_many user
+user 
+	username: string [unique, 4-12 chars, present]
+	email: string [unique, present, validation]
+	password: string [unique, present, validation, 4-12 chars]
+
+	has_one profile
+	belongs_to Users
+
+profile:
+	city: string [present, list of valid options]
+	state: string [present, list of valid options]
+	gender: char [present, validation]
+	age: integer [present, validation]
+	user_id: integer [unique, present]
+	belongs_to user
+
+
+
+3. You want to build a virtual pinboard, so you’ll have users on your platform who can create “pins”. Each pin will contain the URL to an image on the web. Users can comment on pins (but can’t comment on comments).
+
+user: 
+	has_many pins
+	has_many comments
+pins:
+	title: string [4-25 chars, present]
+	body: string(url)  [validation, present]
+	user_id: integer [present]
+	belongs_to_user
+	has_many comments
+
+comments:	
+	body: text  [1-250 chars, present]
+	user_id: integer [present]
+	pin_id: integer [present]
+	belongs_to pin
+	belongs_to user
+
+4. You want to build a message board like Hacker News. Users can post links. Other users can comment on these submissions or comment on the comments. How would you make sure a comment knows where in the hierarchy it lives?
+
+users: 
+	has_many posts
+	has_many comments
+	has_many sub-comments
+
+posts:
+	title:
+	body: link
+	user_id: integer [present]
+	has_many comments
+	belongs_to user
+comments:
+	body: text [1-250 chars, present]
+	user_id: integer [present]
+	post_id: integer [present]
+	comment_id: integer [ blank ]
+	has_many sub-comments
+	belongs_to user
+	belongs_to post
+	belongs_to comment
+sub-comments:
+	body: text [1-250 chars, present]
+	comment_id: integer [present]
+	user_id: integer [present]
+	belongs_to comments
+	belongs_to user
