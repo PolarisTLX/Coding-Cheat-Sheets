@@ -653,7 +653,7 @@ my_numbers
 
 
 
-METHODS ENDING WITH "?"  RETURN "true/false"
+"PREDICATE METHODS" METHODS ENDING WITH "?"  RETURN "true/false"
 
 
 
@@ -936,7 +936,9 @@ BETWEEN? :
     age = 24
     puts "You're NOT a teenager." unless age.between?(13, 19)
 
-IMPORTANT NOTE: The "?" is required in "between?"
+IMPORTANT NOTE:
+BETWEEN IS INCLUSIVE
+The "?" is required in "between?"
 
 
 TERNARY OPERATOR " x ? y : z " :
