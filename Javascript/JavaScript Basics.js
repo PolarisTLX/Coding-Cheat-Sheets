@@ -28,6 +28,7 @@ console.log(false == 0);  //  true
 
 
 "===" (compare while being strict with the type):
+For you do NOT want any type conversion.
 
 console.log( 0 === false); // false
 
@@ -62,6 +63,14 @@ console.log(Infinity / Infinity);  //NaN
 
 Most operators are binary (they take 2 values to complete their "function"):
 Examples:
+
+
+undefined and null  are effectively the same thing. They denote the absence of a meaningful value. They are a value that carries no information.
+
+3 FALSY VALUES:  0, NaN & "" (empty string)
+All others count as TRUTHY.
+
+
 
 Unary Operators:  (takes only 1 value to complete their "function"):
 "typeof"
@@ -121,6 +130,22 @@ Operator Order Of Precence / order of execution:
 (paretheses)  -->   "* / %"  -->  "+ -"    -->   (comparisons (>, >=, ==, != ..)  -->   &&   -->   ||
 
 
+Short-circuit / lazy evaluation:
+
+For && and || ,  the part on the right is evaluated only when necessary.
+
+if  true || X :   true wins out,  X will not be evaluated.
+if the initial value  is false,  X will used, like a replacement.
+Can be a way to fall back on a default value.
+So if you pass the first value but it might turn out empty, or false, or falsy (0, NaN, ""), you will get X instead.
+
+
+if  false && X :   false wins out,   X will not be evaluated.
+OPPOSITE TO value || value !!!
+When the value on the left is something false, (or falsy?), it returns that value, otherwise it returns the value on the right, X.
+
+
+
 
 When you call on a variable that has not been assigned a value, it returns "undefined"
 var tricycle = 3;
@@ -130,6 +155,7 @@ console.log(bicycle); // undefined
 
 defining multiple values at a time with one statement, simply use a comma:
 var one = 1, two = 2, three = 3;
+
 
 
 //Not very useful?
